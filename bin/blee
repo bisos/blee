@@ -481,7 +481,7 @@ _EOF_
 
     # NOTYET, verify that acctName is valid (source needed lib)
 
-    lpDo sudo -u ${acctName} ${opBinBase}/lcaGetNerdFonts.sh -h -v -n showRun -i fullUpdate
+    lpDo sudo -u ${acctName} ${bleeBinBase}/lcaGetNerdFonts.sh -h -v -n showRun -i fullUpdate
 
     lpDo pushd $HOME   # for inBaseDirDo protection
 
@@ -496,7 +496,7 @@ _EOF_
     inBaseDirDo /bisos/blee/extPkgs/emacs-application-framework git reset --hard 4ce9b1cab0f4894adcb1710917f96279cccd401b
 
     # NOTYET, for DEBIAN-12. for emacs=sys  Should check version here. ./bleeDoomsManage.sh
-    lpDo sudo -u ${acctName} ${opBinBase}/bleeDoomsManage.sh -h -v -n showRun -p emacs=sys -p profile=doom-blee3 -i reBuild
+    lpDo sudo -u ${acctName} ${bleeBinBase}/bleeDoomsManage.sh -h -v -n showRun -p emacs=sys -p profile=doom-blee3 -i reBuild
     # lpDo bleeDoomsManage.sh -h -v -n showRun -p profile=sysDoom -i reBuild
 
     lpDo sudo -u ${acctName} ${opBinBase}/bueMailManage.sh -h -v -n showRun -i mhonarcBasePrep
