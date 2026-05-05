@@ -196,11 +196,17 @@ _EOF_
 function vis_emacsServerSocketDefault {
     function describeF {  cat  << _EOF_
 The most recent file in /run/user/$(id -u)/emacs is considered default and is returned.
+Falls back to /tmp/emacs$(id -u)/ when /run/user/<uid>/emacs/ is absent (e.g. in containers
+without systemd-logind where XDG_RUNTIME_DIR is not set).
 _EOF_
   }
     EH_assert [[ $# -eq 0 ]]
 
-    local serverSocket=$( ls -t -1 /run/user/$(id -u)/emacs/* | head -1 ) #2> /dev/null )
+    local serverSocket=$( ls -t -1 /run/user/$(id -u)/emacs/* 2>/dev/null | head -1 )
+
+    if [ -z "${serverSocket}" ] ; then
+        serverSocket=$( ls -t -1 /tmp/emacs$(id -u)/* 2>/dev/null | head -1 )
+    fi
 
     if [ -z "${serverSocket}" ] ; then
         EH_problem "No blee emacs sockets were found"
@@ -223,9 +229,13 @@ _EOF_
     local serverSocket=$( ls -1 /run/user/$(id -u)/emacs/*${parentEmacsPid}* 2> /dev/null )
 
     if [ -z "${serverSocket}" ] ; then
+        serverSocket=$( ls -1 /tmp/emacs$(id -u)/*${parentEmacsPid}* 2> /dev/null )
+    fi
+
+    if [ -z "${serverSocket}" ] ; then
         serverSocket=$( ls -1 /run/user/$(id -u)/emacs/server 2> /dev/null )
         if [ -z "${serverSocket}" ] ; then
-            serverSocket=""
+            serverSocket=$( ls -1 /tmp/emacs$(id -u)/server 2> /dev/null )
         fi
     fi
     
