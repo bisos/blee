@@ -185,6 +185,16 @@ binsPrep_mhonarc_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "mhonarc"; }
 
 ####+END:
 
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "curl"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: curl [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_curl () { distFamilyGenerationHookRun binsPrep_curl; }
+
+binsPrep_curl_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "curl"; }
+
+####+END:
+
 
 _CommentBegin_
 *      ================ /[dblock] -- End-Of-File Controls/
