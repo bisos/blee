@@ -79,8 +79,9 @@ _EOF_
         "graphviz"    # Used by: org-roam,
         "ripgrep"     # Used by: doom,
         "fd_find"     # Used by: doom,
-        "w3m"         # Used by: gnus
+        "w3m"         # Used by: gnu
         "mhonarc"     # Used by: gnus
+        "curl"        # Used for fonts
     )
 
     itemOptionalOrderedList=(
