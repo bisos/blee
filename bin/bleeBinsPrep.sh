@@ -82,6 +82,9 @@ _EOF_
         "w3m"         # Used by: gnu
         "mhonarc"     # Used by: gnus
         "curl"        # Used for fonts
+        "cmake"       # Used to build vterm, etc.
+        "libtool"       # Used to build vterm, etc.
+        "libvterm_dev"       # Used to build vterm, etc.
     )
 
     itemOptionalOrderedList=(
@@ -194,6 +197,38 @@ item_curl () { distFamilyGenerationHookRun binsPrep_curl; }
 binsPrep_curl_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "curl"; }
 
 ####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "cmake"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: cmake [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_cmake () { distFamilyGenerationHookRun binsPrep_cmake; }
+
+binsPrep_cmake_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "cmake"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "libtool"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: libtool [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_libtool () { distFamilyGenerationHookRun binsPrep_libtool; }
+
+binsPrep_libtool_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "libtool"; }
+
+####+END:
+
+####+BEGIN: bx:dblock:lsip:binsprep:apt :module "libvterm-dev"
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]]  [[elisp:(blee:ppmm:org-mode-toggle)][Nat]] [[elisp:(beginning-of-buffer)][Top]] [[elisp:(delete-other-windows)][(1)]] || Apt-Pkg       :: libvterm-dev [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+item_libvterm_dev () { distFamilyGenerationHookRun binsPrep_libvterm_dev; }
+
+binsPrep_libvterm_dev_DEFAULT_DEFAULT () { binsPrepAptPkgNameSet "libvterm-dev"; }
+
+####+END:
+
+
 
 
 _CommentBegin_
