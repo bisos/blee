@@ -96,6 +96,9 @@ $( examplesSeperatorTopLabel "${G_myName}" )
 $( examplesSeperatorChapter "Blee Lib Examples " )
 ${G_myName} ${extraInfo} -i examples_bleeLib
 ${G_myName} ${extraInfo} -i getEmacsVer 0
+$(vis_doomProfileAs doom-dist)
+$(vis_doomProfileAs doom-withoutBlee3)
+$(vis_doomProfileAs doom-blee3)
 $( examplesSeperatorChapter "Doom Main Deploy -- profile=doom-dist emacs=sys" )
 ${G_myName} ${extraInfo} -p emacs=sys -i reBuildAll   # NOTYET, has not been implemented yet
 ${G_myName} ${extraInfo} -p emacs=29 -i reBuildAll    # NOTYET, has not been implemented yet
@@ -132,6 +135,23 @@ $( examplesSeperatorChapter "Blee" )
 blee
 _EOF_
 }
+
+function vis_doomProfileAs {
+    EH_assert [[ $# -eq 1 ]]
+    profile=$1
+    EH_assert doomProfilePrep
+
+  cat  << _EOF_
+$( examplesSeperatorSection "profile=${profile}" )
+# doomRunBase=${doomRunBase} -- Where straight packages are installed (based on doomDirBase)
+# doomDirBase=${doomDirBase}     # Where Doom  init.el, packages.el and config.el are
+# doomFrameworkBase=${doomFrameworkBase}
+_EOF_
+}
+
+
+
+
 
 noArgsHook() {
   vis_examples
@@ -246,6 +266,7 @@ _EOF_
     lpDo mkdir -p ${doomRunBase}
 
     lpDo cp -r ${doomFrameworkBase}/* ${doomRunBase}
+    lpDo cp -r ${doomFrameworkBase}/.git ${doomRunBase}  # This became needed sometime in 2025
 
     lpDo echo DOOMDIR=${DOOMDIR}
     lpDo echo EMACS=${EMACS}
@@ -253,7 +274,7 @@ _EOF_
     # /bisos/git/anon/ext/emacs/doomemacs /bisos/blee/dooms/doomemacs  --- is anon cloned from https://github.com/doomemacs/doomemacs
     # ln -s /bisos/git/anon/ext/emacs/doomemacs /bisos/blee/dooms/doomemacs
     # sha1 obtained on Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
-    inBaseDirDo /bisos/git/anon/ext/emacs/doomemacs git reset --hard 03d692f129633e3bf0bd100d91b3ebf3f77db6d1
+    # inBaseDirDo /bisos/git/anon/ext/emacs/doomemacs git reset --hard 03d692f129633e3bf0bd100d91b3ebf3f77db6d1
 
     # If this proved to be a fix, NOTYET, make bystar a param
     lpDo echo "Be Patient, this can take a Long Time -- Running: sudo -u bystar ${doomRunBase}/bin/doom --force install"
@@ -262,9 +283,9 @@ _EOF_
 
     lpDo vis_switchInitTo withBlee
 
-    # NOTYET
-    echo "NOTYET, BAD and UGLY"
-    lpDo cp /bisos/blee/env3/doom/doom-straight.el /bisos/blee/emacsVers/28.2/doom-run-blee3/lisp/doom-straight.el
+    # NOTYET -- No Longer needed
+    # echo "NOTYET, BAD and UGLY"
+    # lpDo echo cp /bisos/blee/env3/doom/doom-straight.el /bisos/blee/emacsVers/28.2/doom-run-blee3/lisp/doom-straight.el
 
     lpReturn
 }
