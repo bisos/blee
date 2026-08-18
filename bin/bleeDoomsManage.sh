@@ -257,6 +257,11 @@ _EOF_
         lpReturn 1
     fi
 
+    local emacsVer28=$(emacs --version | head -1 | grep 28)
+    local emacsVer29=$(emacs --version | head -1 | grep 29)
+    local emacsVer30=$(emacs --version | head -1 | grep 30)
+    local emacsVer31=$(emacs --version | head -1 | grep 31)
+
     export DOOMDIR="${doomDirBase}"
     export YES=y
     export EMACS="${emacsExec}"
@@ -273,8 +278,18 @@ _EOF_
 
     # /bisos/git/anon/ext/emacs/doomemacs /bisos/blee/dooms/doomemacs  --- is anon cloned from https://github.com/doomemacs/doomemacs
     # ln -s /bisos/git/anon/ext/emacs/doomemacs /bisos/blee/dooms/doomemacs
-    # sha1 obtained on Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
-    # inBaseDirDo /bisos/git/anon/ext/emacs/doomemacs git reset --hard 03d692f129633e3bf0bd100d91b3ebf3f77db6d1
+    #
+
+    if [ ! -z "${emacsVer28}" ] ; then
+        # sha1 obtained on Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
+        inBaseDirDo /bisos/git/anon/ext/emacs/doomemacs git reset --hard 03d692f129633e3bf0bd100d91b3ebf3f77db6d1
+    elif [ ! -z "${emacsVer29}" ] ; then
+        # Placeholder for later use
+        :
+    else
+        # Default is the latest
+        :
+    fi
 
     # If this proved to be a fix, NOTYET, make bystar a param
     lpDo echo "Be Patient, this can take a Long Time -- Running: sudo -u bystar ${doomRunBase}/bin/doom --force install"
