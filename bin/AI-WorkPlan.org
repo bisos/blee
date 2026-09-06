@@ -1,0 +1,97 @@
+#+title: blee/bin --- Work Plan
+#+DATE: <2026-09-06 Sun 11:28>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+#+TAGS: me ai aiAndMe
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-09-06T10:36:13-07:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/pipx/bin/aiActivity.cs -i initiate --activity=bisos-core
+
+This Work Plan file drives the AI collaborative development.
+Interactions are broken down into "Stages". Each Stage has a set
+of TODOs that I work with Claude to accomplish.
+
+Companion docs: [[file:][]] (agent guidance / layering), [[file:README.org][README.org]] (overview).
+
+
+* Stage 1: Improve lcaEmacsSrcBinsPrep.sh
+
+A Stage is typically expressed as a set of TODO lists
+and well defines goals.
+
+* Stage 1 TODOs
+** +
+** TODO [#A] <<1.1>> Add emacs-31 to lcaEmacsSrcBinsPrep.sh :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+Support build of emacs-31 on Deb 12 and Deb 13.
+----- AI Results: ------
+
+** TODO [#C] <<1.2>> Cleanup and improve lcaEmacsSrcBinsPrep.sh :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+Get rid of old ubuntu history. Focus on Deb 12+ Emacs 28+
+----- AI Results: ------
+** -
+
+* Stage 2: Understand and Improve /bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org
+
+Goal: Accurate Documentation
+
+* Stage 2 TODOs
+** +
+** TODO [#A] <<2.1>> Read through /bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org :ai:
+SCHEDULED: <2026-09-06 Sun 11:24>
+Follow relevant links and information
+----- AI Results: ------
+
+** TODO [#C] <<2.2>> Correct and Improve as we move forward. :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+Don't do anything for now. We will come back to this as we move forward
+----- AI Results: ------
+** -
+
+* Stage 3: Get doom-blee to work with emacs-31
+
+Goal: Backwards Compatibility is very important.
+
+* Stage 3 TODOs
+** +
+** TODO [#A] <<3.1>> Understand the current set up at /bisos/blee and related scripts in /bisos/blee/bin :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+There are likely some obsolete and unused directories there.
+Document import discoveries in [[2.2]]
+----- AI Results: ------
+
+** TODO [#C] <<3.2>> Build doom-blee for emacs-31 :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+Outline needed changes and confirm with me.
+Make needed modifications to relevant scripts.
+Don't run the build scripts. Ask me to run them.
+----- AI Results: ------
+** -
+
+* Stage 4: Create latestEmacsBlee as a Collective CBM
+
+Goal: So that it can be subjected to regression rebuild
+
+* Stage 4 TODOs
+** +
+** TODO [#C] <<4.1>> Create needed -cbs.pcs and -sbom.pcs :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+This will be an example of induction Capability.
+I'll describe details later. We wont be needing this immediately.
+----- AI Results: ------
+
+** TODO [#C] <<4.2>> Subject it to sysCbmManage.cs :aiAndMe:
+SCHEDULED: <2026-09-06 Sun 11:24>
+This is for later as well
+----- AI Results: ------
+** -
+
+
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:

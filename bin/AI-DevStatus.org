@@ -1,0 +1,23 @@
+#+title: Development Status & Continuation Handoff
+#+TAGS: me(m) ai(a)
+
+# Provenance (installed once by aiActivity.cs --- not regenerated):
+#   Date:      2026-09-06T10:36:13-07:00
+#   User:      bystar
+#   Templates: /bisos/apps/defaults/ai-templates
+#   Command:   /bisos/pipx/bin/aiActivity.cs -i initiate --activity=bisos-core
+
+This file is a working-state handoff so development can continue on another
+machine (which has this repo but NOT the developer's =~=). It captures the
+architecture, what works, what is untested and the design decisions made so far.
+
+This file is to be maintained by Claude. When a release is being made, claude should be
+prompted to update this document.
+
+Companion docs: [[file:][]] (agent guidance / layering), [[file:README.org][README.org]] (overview).
+
+
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:
