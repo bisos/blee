@@ -425,9 +425,14 @@ function doomProfilePrep {
 \${profile} name here need not match what is blee's .emacs-profile.el, but we use the same.
 But
 ** Three variables are set:
-1) <<doomFrameworkBase>> /bisos/blee/dooms/doomemacs  --- is anon cloned from https://github.com/doomemacs/doomemacs
+1) <<doomFrameworkBase>> /bisos/blee/dooms/doomemacs-<emacsMajor> --- anon clone of https://github.com/doomemacs/doomemacs
+   PER EMACS MAJOR VERSION, so that a build for one emacs can never disturb the doom tree
+   another emacs is pinned to. emacs28 stays on its Dec-2023 pin while emacs31 tracks latest.
+   Falls back to the historical shared /bisos/blee/dooms/doomemacs when no per-version clone
+   exists, so emacs 28/29/30 behave exactly as before this change.
+   Create/update with: bleeDoomsManage.sh -p emacs=<N> -i doomFrameworkPrep
 2) <<doomDirBase>> /bisos/blee/dooms/doom-base-blee3  == Equivalent of .doom.d dir for packages and config
-3) <<doomRunBase>> /bisos/blee/emacsVers/28.1/doom-run-blee3  == Re-creatable by bleeDoomManage.sh
+3) <<doomRunBase>> /bisos/blee/emacsVers/<emacsVer>/doom-run-blee3  == Re-creatable by bleeDoomsManage.sh
 _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
@@ -443,7 +448,19 @@ _EOF_
     fi
 
     #doomFrameworkBase=/bisos/blee/doom-emacs-framework
-    doomFrameworkBase="/bisos/blee/dooms/doomemacs"
+    #
+    # doomFrameworkBase is PER EMACS MAJOR VERSION. Before 2026-09 there was a single shared
+    # doomemacs clone and bleeDoomsManage.sh git-reset it in place per build, which could not
+    # support two emacs versions coexisting. Each major version now gets its own clone at its
+    # own pin. Create them with: bleeDoomsManage.sh -p emacs=<N> -i doomFrameworkPrep
+    #
+    # The fallback keeps this backwards compatible: until a per-version clone is created, the
+    # historical shared clone is used, so emacs 28/29/30 are unaffected by this change.
+    local emacsMajor=$( echo ${emacsVer} | cut -d '.' -f 1 )
+    doomFrameworkBase="/bisos/blee/dooms/doomemacs-${emacsMajor}"
+    if [ ! -d "${doomFrameworkBase}" ] ; then
+        doomFrameworkBase="/bisos/blee/dooms/doomemacs"
+    fi
     case $profile in
         doom-dist)
             #doomRunBase="/bisos/blee/emacsVers/${emacsVer}/doom-main-emacs"

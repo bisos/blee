@@ -24,10 +24,66 @@ and well defines goals.
 
 * Stage 1 TODOs
 ** +
-** TODO [#A] <<1.1>> Add emacs-31 to lcaEmacsSrcBinsPrep.sh :aiAndMe:
+** DONE [#A] <<1.1>> Add emacs-31 to lcaEmacsSrcBinsPrep.sh :aiAndMe:
+CLOSED: [2026-09-06 Sun 19:35]
 SCHEDULED: <2026-09-06 Sun 11:24>
 Support build of emacs-31 on Deb 12 and Deb 13.
 ----- AI Results: ------
+
+emacs31 is wired through every stage of =lcaEmacsSrcBinsPrep.sh=:
+=emacsVerLatest="emacs31"= (line 101), the examples menu, =srcPkgSpecPrep_emacs31_git=,
+=vis_srcEnvSetup_emacs31=, =vis_srcBuild_emacs31=, srcBinInstall, postInstall,
+installedVerify and setAsDefault.
+
+Verified build (Deb 13 container, =-i installedVerify emacs31=):
+- emacs 31.1.50, repo rev cf1d8f9bc905, from the =emacs-31= release branch
+- =native-comp-available-p= = t (HAVE_NATIVE_COMP + HAVE_LIBGCCJIT)
+- =treesit-available-p= = t (tree-sitter 0.28.0, built from source into /usr/local)
+- X11 + GTK3 + CAIRO + HARFBUZZ + LIBOTF + M17N_FLT (Farsi/Arabic shaping stack intact)
+- images: svg webp png gif tiff jpeg xpm xbm pbm ; GNUTLS ZLIB SQLITE3 LIBXML2 GMP
+  DBUS GSETTINGS MODULES THREADS INOTIFY PDUMPER SECCOMP SOUND XINPUT2 XRANDR XINERAMA
+- postInstall versioned-symlink scheme generalized cleanly:
+  emacs-31 -> emacs-31.1.50, emacsclient-31 -> emacsclient-31.1.50,
+  unversioned /usr/local/bin/emacs removed so multiple versions coexist.
+
+Non-issues, do not chase: the configure "Your version of Gtk+ will have problems
+with closing open displays" WARNING is emitted for every GTK3 build (GTK issue 221);
+absent HAVE_JSON is correct (Emacs 30+ has a built-in JSON parser, jansson dropped);
+absent HAVE_XFT is correct (superseded by Cairo+HarfBuzz); =--with-mps= (igc) does not
+exist on the emacs-31 branch, only on scratch/igc; ctags is no longer installed
+(removed in Emacs 30), only etags.
+
+Improvements found but deliberately NOT made under 1.1 --- carried to [[1.2]].
+NONE of these affect the emacs-31 binary's function relative to emacs-30 built by
+this same script: buildConfigOptions is identical for both (lines 296 and 316) and
+they share the same dependency path. Items 1,2,3,6,7 are efficiency/waste only.
+Items 4,5 (and the re-clone noted under 4) are reproducibility and re-run
+idempotency --- they fail loudly, and only when the script is re-run. Item 8 is a
+property of the binary but is equally absent from emacs-30 here, so not a regression.
+
+1. Native comp is not AOT. Bare =--with-native-compilation= compiled only the ~150
+   preloaded .eln; the rest JIT-compile per-user into ~/.emacs.d/eln-cache.
+   =--with-native-compilation=aot= would compile all into the system native-lisp dir.
+   Matters for a shared /usr/local install and for doom-blee first-run churn ([[3.2]]).
+2. No parallel make. =make bootstrap= (line 1450) and =make install= run serially;
+   =-j$(nproc)= is the cheapest available speedup.
+3. libwebkit2gtk-4.1-dev is installed as a dependency but =--with-xwidgets= is never
+   passed, so HAVE_XWIDGETS is undef --- a large dep pulled in for nothing.
+   Either pass the option or drop the packages.
+4. tree-sitter is cloned from unpinned upstream master (no -b/tag) and =sudo make
+   install=-ed into /usr/local; we got the 2026-09-04 "nightly" tag. Non-reproducible,
+   which conflicts with the regression-rebuild goal of Stage 4. Pin a tag or use
+   Debian's libtree-sitter-dev. Also =git clone= into an existing dir fails on re-run.
+5. =vis_postInstall_common= is not idempotent: line 1636 reads
+   /usr/local/bin/emacsclient --version but line 1650 renames that file away, so
+   re-running -i postInstall without a fresh make install errors out.
+6. Dead code: =installedVerify= line 1697 computes local emacsProg and never uses it.
+7. =vis_srcEnvSetup_emacs31= delegates to =vis_srcEnvSetup_emacs27= (line 977) ---
+   works, but the emacs27-named function is where the Deb 12/13 + libgccjit logic
+   lives. Legacy naming to clean up.
+8. HAVE_LIBSELINUX is undef while the host kernel is EL8 and files carry SELinux
+   contexts. Emacs will not preserve context when rewriting files on the host side.
+   Add libselinux1-dev only if Blee edits host-side labelled files.
 
 ** TODO [#C] <<1.2>> Cleanup and improve lcaEmacsSrcBinsPrep.sh :aiAndMe:
 SCHEDULED: <2026-09-06 Sun 11:24>
@@ -41,15 +97,149 @@ Goal: Accurate Documentation
 
 * Stage 2 TODOs
 ** +
-** TODO [#A] <<2.1>> Read through /bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org :ai:
+** DONE [#A] <<2.1>> Read through /bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org :ai:
+CLOSED: [2026-09-06 Sun 20:03]
 SCHEDULED: <2026-09-06 Sun 11:24>
 Follow relevant links and information
 ----- AI Results: ------
 
-** TODO [#C] <<2.2>> Correct and Improve as we move forward. :aiAndMe:
+SUMMARY: Panel read in full and every asserted path resolved against the live system.
+Boot chain and section 3.3.1 verified accurate. Two systematic errors found: the doom run
+directory is doom-run-<profile> (the panel used three wrong spellings, all tracing to
+bleeLib.sh's JUNKYARD doomProfilePrepOld), and the manager script is bleeDoomsManage.sh
+(two other names in the panel never existed). Key discovery for [[3.2]]: the doom machinery
+already generalizes to emacs-31 with no code change. Corrections applied under [[2.2]].
+
+Panel read in full (338 lines) and every path/link it asserts was resolved against
+the live filesystem. Truename: /bisos/git/auth/bxRepos/blee-binders/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org
+Per [[2.2]] the panel itself was NOT edited. Findings recorded here for that pass.
+
+*** The panel is load-bearing, not scratch notes
+/bisos/blee/env3/boot/boot-blee.el line 7 names this panel (::boot-blee anchor) as its
+own documentation of record. Fixing it under [[2.2]] therefore fixes a live code comment.
+
+*** VERIFIED ACCURATE
+- Boot chain 1 -> 2 -> 3.3 -> 3.3.1 -> 3.3.2 is correct end to end.
+- ~/.emacs.d is fully chemacs-controlled: early-init.el and init.el each do nothing but
+  require chemacs.el and call chemacs-load-user-{early-,}init. Exactly as documented.
+- ~/.emacs-profiles.el is machine-generated by =blee ... vis_emacsProfilesStdout=
+  (header comment confirms, stamped 20260905211320).
+- Section 3.3.1 (boot-blee.el): all seven bullets check out against the source ---
+  GC raise to 100MB, blee-version.el, control/central.el, comment-block, blee-libs,
+  main/main-init.el, GC restore on idle timer.
+- doomFrameworkBase = /bisos/blee/dooms/doomemacs (symlink -> /bisos/git/anon/ext/emacs/doomemacs). Correct.
+- doomDirBase = /bisos/blee/dooms/doom-base-blee3. Correct.
+- Policies section correct: no ~/.emacs.el, package.el disabled, straight used instead.
+
+*** STALE OR WRONG --- the [[2.2]] worklist
+1. *Run-directory name is wrong in three different ways.* Panel says =doom-blee3= (l.68),
+   =doom-main-blee3= (l.79,80) and =doom-main-pure= (l.150,160). Actual is
+   =doom-run-<profile>= --- on disk: /bisos/var/blee/emacsVers/28.2/doom-run-blee3.
+   The =doom-main-*= spelling survives ONLY in =doomProfilePrepOld= in bleeLib.sh, which
+   sits under a "########## JUNKYARD ############" banner and is used only by =oldBlee=.
+   The panel is documenting the junkyard variant. Panel's var =doomMainBase= is =doomRunBase=.
+2. *Script named three ways.* =bleeDoomsManage.sh= (correct, exists),
+   =bleeDoomManage.sh= (l.63,64 --- does not exist), =emacsDoomManage.sh= (l.87,267,268,270
+   --- does not exist).
+3. *Version dirs.* Panel variously says 28.1, 28.1.50, 28.2. Only 28.2 exists. The version
+   is not a fixed label --- =vis_getEmacsVer= derives it from the binary itself
+   (=emacs --version | cut -f3=), so the dir is whatever that binary reports.
+4. l.77 "THIS IS OBSOLETED emacsVers is in var" is now resolved and can be retired:
+   /bisos/blee/emacsVers -> var/emacsVers -> /bisos/var/blee/emacsVers, so every
+   /bisos/blee/emacsVers/... path in the panel still resolves correctly.
+5. *Profile table.* =doom-sansBlee3= (listed twice) does not exist; the real profile is
+   =doom-withoutBlee3=. It IS already present in bleeDoomsManage.sh and .emacs-profiles.el,
+   so the "TODO Add profile in bleeDoomsManage.sh" row is already done.
+6. =blee1= profile points at /bisos/blee/blee-1-init, which does not exist here. Panel
+   claims "Old, no doom at all -- But works". It cannot work on this machine.
+7. l.75: doom-base-blee3/blee-boot-load.el does not exist; the actual file is blee-init.el.
+   l.74 "init.el is composed of sansBlee" is misplaced --- in blee3 the composition happens
+   on *config.el* (configSansBlee.el + extras.el -> configWithBlee.el -> config.el, per
+   =vis_switchInitTo=). blee3 has init.el + realInit.el.
+8. Section 3.2 cites doom-base-blee2 files (initSansBlee.el, loadBlee.el) which exist only
+   in blee2, not blee3. Section is already flagged OBSOLETED, so this is consistent.
+9. Table row "Emacs Binaries ... emacs 28.2 and emacs 30" --- here it is 28.2 (sys, /bin/emacs)
+   and 31.1.50 (/usr/local). No emacs-30 is installed.
+
+*** DISCOVERY that matters for [[3.2]]
+The doom machinery *already generalizes to emacs-31 with no code change*:
+=blee -p emacs=31= -> =vis_getEmacsExec= -> /usr/local/bin/emacs-31 (exists, from [[1.1]])
+-> =vis_getEmacsVer= -> "31.1.50" -> doomRunBase=/bisos/blee/emacsVers/31.1.50/doom-run-blee3.
+Caveats to confirm before 3.2:
+- ~/.emacs-profiles.el is a single global file currently hardcoding 28.2 paths. Regenerating
+  it for 31 repoints "default" away from 28.2 --- a backwards-compatibility question, since
+  both versions cannot be the chemacs default at once.
+- =vis_getEmacsExec= case "0" hardcodes a fallback to /usr/local/bin/emacs-28.
+
+*** DISCOVERY that matters for [[3.1]] (obsolete/unused)
+bleeLib.sh carries an explicit JUNKYARD section (=doomProfilePrepOld=, reached only via
+=oldBlee=, which is still present as /bisos/blee/bin/oldBlee). /bisos/blee/dooms also still
+carries doom-base-blee2. These are the "likely obsolete" items 3.1 anticipates.
+
+*** Smell, not yet a bug
+boot-blee.el:51 calls =advice-remove #'doom-straight--no-compute-prefixes-a= unconditionally,
+including on the pure-blee path where doom was never loaded. Harmless as written
+(advice-remove on an unknown symbol is a no-op) but it is doom leaking into pure-blee ---
+worth a look under the panel's own "Get PureBlee3 to work" TODO.
+
+** DONE [#C] <<2.2>> Correct and Improve as we move forward. :aiAndMe:
+CLOSED: [2026-09-06 Sun 20:03]
 SCHEDULED: <2026-09-06 Sun 11:24>
 Don't do anything for now. We will come back to this as we move forward
 ----- AI Results: ------
+
+SUMMARY: All [[2.1]] findings applied to the blee-boot panel --- 12 edits, 338 -> 382 lines.
+doomRunBase/doom-run-<profile> naming corrected throughout, script name fixed, 3.2 relabelled
+as blee2-era history, the two near-duplicate doom tables merged into one correct table, the
+empty lcaEmacsSrcBinsPrep.sh section filled in, and an Accuracy provenance block added.
+No dblock contents touched; verified by org-element parse and re-grep.
+CAUTION: the panel is NOT git-tracked --- see the safety note below.
+
+<2026-09-06 Sun> Done on explicit instruction, overriding this TODO's own "don't do
+anything for now". All [[2.1]] findings applied to
+/bisos/git/auth/bxRepos/blee-binders/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org
+(reached via /bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org).
+
+*** SAFETY NOTE --- the panel is NOT git-tracked
+In the blee-binders repo the entire blee-core/ tree is untracked (git ls-files returns
+nothing; last commit f9b8a2a "Updated panel"). So panel edits have NO revert path.
+A pre-edit backup was left at:
+  <scratchpad>/fullUsagePanel-en.org.bak
+Worth deciding separately whether blee-binders should be tracking these panels at all.
+
+*** What was changed (12 edits, 29202 -> ~33KB, 338 -> 382 lines)
+- Added an "Accuracy provenance" block recording the date, the two systematic errors,
+  and the fact that boot-blee.el names this panel as its documentation of record.
+- <emacsVer> explained as derived from the binary, not a chosen label.
+- 3.1: doomMainBase -> doomRunBase; doom-blee3 -> doom-run-<profile> throughout;
+  bleeDoomManage.sh -> bleeDoomsManage.sh (+ explicit note that the other two names
+  never existed); blee.sh -> blee; blee-boot-load.el -> blee-init.el; corrected the
+  withBlee/sansBlee composition to config.el (not init.el) via -i switchInitTo;
+  named doomProfilePrep as the source of the three bases, and flagged doomProfilePrepOld
+  as JUNKYARD/oldBlee.
+- 3.2: obsolescence reason rewritten --- it is blee2-era, not "emacsVers is in var",
+  and that caveat is now marked RESOLVED with the symlink chain shown.
+- Emacs Binaries table: replaced "emacs 28.2 and emacs 30" with the actual scheme
+  (emacs-<N> -> emacs-<fullVer> symlinks, unversioned emacs removed) plus a
+  vis_getEmacsExec selection row.
+- ch-profile table: doom-sansBlee3 -> doom-withoutBlee3, its stale "TODO Add profile"
+  row retired as already-done, blee1's "But works" qualified (blee-1-init not deployed),
+  and a NOTE row added that the dir is doom-run-<suffix>.
+- doom:/doomsBlee: tables merged into one correct profile -> doomRunBase/doomDirBase
+  table, with doomFrameworkBase and an explicit "~/.doom.d and ~/.doom are NOT used;
+  DOOMDIR is used instead" note.
+- lcaEmacsSrcBinsPrep.sh section: was the single line "run the script"; now documents
+  the versions, all seven -i stages, srcPkgs location, configure options, tree-sitter.
+- Trailing OBSOLETED Doom+Blee section labelled blee2-era; its "TODO Verify all paths
+  are accurate" marked DONE; emacsDoomManage.sh -> bleeDoomsManage.sh -i reBuild.
+
+*** Verification performed
+- No edits inside any ####+BEGIN:/####+END dblock region. Dblocks balanced 27/27.
+- Parsed with emacs-31 org-element-parse-buffer: 231 headlines, 5 tables, no errors.
+- All 5 tables re-aligned by org-table-align itself (not by hand).
+- Every remaining occurrence of doom-main-* / bleeDoomManage.sh / emacsDoomManage.sh /
+  doom-sansBlee3 / blee-boot-load.el was re-grepped and confirmed to be an intentional
+  "this is the old/wrong name" note, not a live assertion.
 ** -
 
 * Stage 3: Get doom-blee to work with emacs-31
@@ -58,11 +248,60 @@ Goal: Backwards Compatibility is very important.
 
 * Stage 3 TODOs
 ** +
-** TODO [#A] <<3.1>> Understand the current set up at /bisos/blee and related scripts in /bisos/blee/bin :aiAndMe:
+** DONE [#A] <<3.1>> Understand the current set up at /bisos/blee and related scripts in /bisos/blee/bin :aiAndMe:
+CLOSED: [2026-09-06 Sun 22:38]
 SCHEDULED: <2026-09-06 Sun 11:24>
 There are likely some obsolete and unused directories there.
 Document import discoveries in [[2.2]]
 ----- AI Results: ------
+
+SUMMARY: Surveyed all 17 symlinks under /bisos/blee. All resolve; all are git-tracked in the
+blee repo. Four marked deletable, nothing deleted. Per this TODO's own instruction the
+discoveries were written into the panel rather than duplicated here.
+
+*** WHERE THE RECORD LIVES (out-of-chain pointer)
+Authoritative record is the new "* Obsoleted Directories and Links" section, anchor
+<<obsoleted-links>>, in
+/bisos/panels/blee-core/blee-boot/_nodeBase_/fullUsagePanel-en.org
+(truename /bisos/git/auth/bxRepos/blee-binders/blee-core/blee-boot/...).
+It holds the full verdict table plus the envsShare, var-trap, extPkgs and coherent-cut notes.
+- That file is NOT git-tracked (blee-core/ is untracked in blee-binders) --- no revert path.
+- Contents verified against the live system <2026-09-06 Sun>.
+Recorded here per the "Documentation Outside The Import Chain" rule added to AI-WORKFLOW.org
+this session --- a fresh Claude does not load panels.
+
+*** DELETABLE --- four links, nothing done
+dooms/doom-base-blee2 (zero refs anywhere), extPkgs/frame-cmds, extPkgs/frame-fns,
+extPkgs/thumb-frm (referenced only inside the old env/ blee1 tree).
+Also QUESTIONABLE: extPkgs/emacs-application-framework --- pinned by blee:498 in
+vis_provisionSetup, but env3 never loads EAF.
+
+*** TWO TRAPS --- both would survive a mechanical sweep and both are wrong to delete
+- =var= has zero path refs but is load-bearing: emacsVers -> var/emacsVers is RELATIVE.
+  Chain is /bisos/blee/emacsVers -> var/emacsVers -> /bisos/blee/var -> /bisos/var/blee
+  -> /var/bisos/blee. Four hops; /bisos/var is itself a symlink.
+- =envsShare= has zero path refs BY DESIGN. It declares intent: the blee envs are numbered
+  (env, env3, a future env4) and are peers that share common parts, which live in envsShare.
+  env3's ../envsShare/* links resolve inside the git repo, never through /bisos/blee.
+  General rule now written into the panel: "unreferenced" is not the same as "obsolete".
+
+*** METHOD NOTE worth keeping
+Exact-path grep, not prefix. "blee/env" also matches env3 and envsShare, which is what made a
+first pass report 78 consumers for env when the real count from bin/ is two scripts.
+
+*** SIDE FINDINGS
+- extPkgs/ is the PRE-STRAIGHT package mechanism; env3 uses straight. Proof: env/boot/bcg-org.el:86
+  has :load-path "/bisos/blee/extPkgs/org-recoll" and that dir does not exist, while
+  env3/plus/bcpg:orgPlus.el:107 does (b:pkg:straight|install 'org-recoll).
+- Corrects [[2.1]]: the blee1 chemacs profile is UNPROVISIONED, not permanently broken.
+  vis_blee1InitSetup creates /bisos/blee/blee-1-init from env/init/ templates, as part of
+  vis_provisionSetup, which has not been run on this node.
+- /bisos/git/bxRepos is a symlink to /bisos/git/auth/bxRepos. Own repos are linked via bxRepos
+  (portable across auth/anon deployments); external upstreams go direct to /bisos/git/anon/ext.
+  The mixed convention is coherent, not an inconsistency.
+- The coherent cut: the three extPkgs links are one decision, not three --- blee1 is their only
+  consumer. Retiring blee1 drops env, all four extPkgs links, bin/oldBlee and bleeLib.sh's
+  JUNKYARD doomProfilePrepOld together.
 
 ** TODO [#C] <<3.2>> Build doom-blee for emacs-31 :aiAndMe:
 SCHEDULED: <2026-09-06 Sun 11:24>

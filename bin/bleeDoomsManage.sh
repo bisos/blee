@@ -131,6 +131,17 @@ ${G_myName} ${extraInfo} -p emacs=29 -p profile=doom-blee3 -i buildInstall
 ${G_myName} ${extraInfo} -p emacs=29 -p profile=doom-blee3 -i doomSync
 ${G_myName} ${extraInfo} -p emacs=29 -p profile=doom-blee3 -i deleteRunBase
 ${G_myName} ${extraInfo} -p emacs=29 -p profile=doom-blee3 -i reBuild           #  deleteRunBase + buildInstall
+$( examplesSeperatorChapter "Doom Framework Clones -- one per emacs major version" )
+${G_myName} ${extraInfo} -p emacs=28 -i doomFrameworkPrep   # frozen at Dec-2023 pin
+${G_myName} ${extraInfo} -p emacs=31 -i doomFrameworkPrep   # tracks latest
+ls -ld /bisos/blee/dooms/doomemacs*                         # per-version clones + legacy shared
+$( examplesSeperatorChapter "Doom Main Deploy -- profile=doom-blee3 emacs=31" )
+${G_myName} ${extraInfo} -p emacs=31 -i doomFrameworkPrep   # run this FIRST, once
+${G_myName} ${extraInfo} -p emacs=31 -p profile=doom-blee3 -i buildInstall
+${G_myName} ${extraInfo} -p emacs=31 -p profile=doom-blee3 -i doomSync
+${G_myName} ${extraInfo} -p emacs=31 -p profile=doom-blee3 -i deleteRunBase
+${G_myName} ${extraInfo} -p emacs=31 -p profile=doom-blee3 -i reBuild           #  deleteRunBase + buildInstall
+blee -p emacs=31 -i run doom-blee3
 $( examplesSeperatorChapter "Blee" )
 blee
 _EOF_
@@ -240,6 +251,99 @@ _EOF_
     esac
 }
 
+_CommentBegin_
+*  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  doomFrameworkPrep    [[elisp:(org-cycle)][| ]]
+_CommentEnd_
+
+function doomPinForEmacsMajor {
+    local emacsMajor="$1"
+
+    # The doom commit each emacs major version is built against.
+    # "latest" means track upstream master (git pull).
+    case ${emacsMajor} in
+        28)
+            # sha1 obtained Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
+            # emacs28 is FROZEN here. Do not move this without re-testing blee on emacs28.
+            echo "03d692f129633e3bf0bd100d91b3ebf3f77db6d1"
+            ;;
+        31)
+            echo "latest"
+            ;;
+        *)
+            echo "latest"
+            ;;
+    esac
+}
+
+function vis_doomFrameworkPrep {
+   G_funcEntry
+    function describeF {  G_funcEntryShow; cat  << _EOF_
+** Create or update the per-emacs-major-version doom framework clone.
+Each emacs major version gets its own doomemacs working tree, so that emacs28 can stay
+frozen at its Dec-2023 pin while emacs31 tracks latest, without the two disturbing
+each other. Before this existed there was ONE shared clone that each build reset in place.
+
+Upstream clones live under /bisos/git/anon/ext/emacs/ (the convention for external
+upstreams) and are surfaced as symlinks under /bisos/blee/dooms/ (the convention for
+blee-visible bases).
+
+Run this ONCE per emacs version before the first buildInstall for that version:
+  ${G_myName} -p emacs=31 -i doomFrameworkPrep
+Re-running updates a "latest" pin and re-asserts a frozen one.
+_EOF_
+                       }
+    EH_assert [[ $# -eq 0 ]]
+
+    local emacsExec=$( vis_getEmacsExec ${emacs} )
+
+    if [ -z "${emacsExec}" ] ; then
+        EH_problem "Bad emacsExec -- is /usr/local/bin/emacs-${emacs} installed?"
+        lpReturn 1
+    fi
+
+    local emacsVerFull=$( vis_getEmacsVerFromExec ${emacsExec} )
+    local emacsMajor=$( echo ${emacsVerFull} | cut -d '.' -f 1 )
+
+    if [ -z "${emacsMajor}" ] ; then
+        EH_problem "Could not determine emacs major version from ${emacsExec}"
+        lpReturn 1
+    fi
+
+    local doomPin=$( doomPinForEmacsMajor ${emacsMajor} )
+    local cloneBase="/bisos/git/anon/ext/emacs/doomemacs-${emacsMajor}"
+    local linkBase="/bisos/blee/dooms/doomemacs-${emacsMajor}"
+
+    ANT_raw "emacs=${emacsExec} emacsVer=${emacsVerFull} emacsMajor=${emacsMajor} doomPin=${doomPin}"
+
+    if [ ! -d "${cloneBase}" ] ; then
+        lpDo git clone https://github.com/doomemacs/doomemacs.git ${cloneBase}
+    fi
+
+    if [ ! -d "${cloneBase}" ] ; then
+        EH_problem "Clone failed -- missing ${cloneBase}"
+        lpReturn 1
+    fi
+
+    if [ "${doomPin}" == "latest" ] ; then
+        inBaseDirDo ${cloneBase} git checkout master
+        inBaseDirDo ${cloneBase} git pull
+    else
+        inBaseDirDo ${cloneBase} git fetch --all
+        inBaseDirDo ${cloneBase} git reset --hard ${doomPin}
+    fi
+
+    lpDo FN_fileSymlinkUpdate ${cloneBase} ${linkBase}
+
+    # NOTE: do NOT pass a quoted --format through inBaseDirDo -- it word-splits its args and
+    # the format string shatters. Capture with git -C instead.
+    local doomHead=$( git -C ${cloneBase} log -1 --format='%h %ci' )
+    ANT_raw "doomFrameworkBase now at: ${doomHead}"
+
+    lpDo ls -ld ${linkBase}
+
+    lpReturn
+}
+
 
 function vis_buildInstall {
    G_funcEntry
@@ -257,10 +361,17 @@ _EOF_
         lpReturn 1
     fi
 
-    local emacsVer28=$(emacs --version | head -1 | grep 28)
-    local emacsVer29=$(emacs --version | head -1 | grep 29)
-    local emacsVer30=$(emacs --version | head -1 | grep 30)
-    local emacsVer31=$(emacs --version | head -1 | grep 31)
+    # NOTE <2026-09-06>: this used to run a bare "emacs --version", i.e. the SYS emacs, not the
+    # emacs selected by -p emacs=NN. On a node whose sys emacs is 28.x, "-p emacs=31 -i reBuild"
+    # therefore took the emacs28 branch. It also grep'ed for the digits anywhere in the version
+    # line, so 31.0.28 would match 28. Both are fixed by deriving the major from ${emacsExec}.
+    local emacsVerFull=$( vis_getEmacsVerFromExec ${emacsExec} )
+    local emacsMajor=$( echo ${emacsVerFull} | cut -d '.' -f 1 )
+
+    if [ -z "${emacsMajor}" ] ; then
+        EH_problem "Could not determine emacs major version from ${emacsExec}"
+        lpReturn 1
+    fi
 
     export DOOMDIR="${doomDirBase}"
     export YES=y
@@ -270,8 +381,14 @@ _EOF_
 
     lpDo mkdir -p ${doomRunBase}
 
-    lpDo cp -r ${doomFrameworkBase}/* ${doomRunBase}
-    lpDo cp -r ${doomFrameworkBase}/.git ${doomRunBase}  # This became needed sometime in 2025
+    # NOTE <2026-09-06>: this was "cp -r ${doomFrameworkBase}/* " plus an explicit copy of .git.
+    # The glob * does not match DOTFILES, which is why .git needed its own line in 2025. Doom
+    # has since added .doom (the version file that doom-version reads), and with the old copy
+    # it was silently omitted -- "doom install" then died with:
+    #   file-missing ... "<doomRunBase>/.doom"
+    # Using "/." copies the directory contents INCLUDING dotfiles, so .doom, .doomrc,
+    # .dir-locals.el, .git and anything doom adds next all come across without special cases.
+    lpDo cp -r ${doomFrameworkBase}/. ${doomRunBase}
 
     lpDo echo DOOMDIR=${DOOMDIR}
     lpDo echo EMACS=${EMACS}
@@ -280,16 +397,16 @@ _EOF_
     # ln -s /bisos/git/anon/ext/emacs/doomemacs /bisos/blee/dooms/doomemacs
     #
 
-    if [ ! -z "${emacsVer28}" ] ; then
-        # sha1 obtained on Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
-        inBaseDirDo /bisos/git/anon/ext/emacs/doomemacs git reset --hard 03d692f129633e3bf0bd100d91b3ebf3f77db6d1
-    elif [ ! -z "${emacsVer29}" ] ; then
-        # Placeholder for later use
-        :
-    else
-        # Default is the latest
-        :
-    fi
+    # <2026-09-06> Doom framework pinning moved OUT of this function.
+    #
+    # It used to "git reset --hard" the SINGLE shared clone at /bisos/git/anon/ext/emacs/doomemacs.
+    # That had two defects: (a) one shared mutable tree cannot support emacs28-pinned and
+    # emacs31-latest coexisting --- last builder won; and (b) the reset ran AFTER the "cp -r
+    # ${doomFrameworkBase}" above, so the pin only affected the NEXT build, not this one.
+    #
+    # doomFrameworkBase is now per emacs major version and already carries the correct pin by
+    # the time we get here. See doomProfilePrep in bleeLib.sh and -i doomFrameworkPrep below.
+    lpDo echo "emacsMajor=${emacsMajor} doomFrameworkBase=${doomFrameworkBase}"
 
     # If this proved to be a fix, NOTYET, make bystar a param
     lpDo echo "Be Patient, this can take a Long Time -- Running: sudo -u bystar ${doomRunBase}/bin/doom --force install"
