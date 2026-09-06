@@ -97,7 +97,8 @@ srcObtainForm="git"
 # BEGIN PKG Base Variables
 
 #emacsVerLatest="emacs29"
-emacsVerLatest="emacs30"
+#emacsVerLatest="emacs30"
+emacsVerLatest="emacs31"
 emacsVerCurrent="emacs28"
 
 srcPkgName="${emacsVerCurrent}"
@@ -149,6 +150,7 @@ As of 2022-05-22 srcPkgSelector is one of: emacsVer =  latest current emacs29 em
 $( examplesSeperatorSection "srcPkgSpecPrep:: determine driving params for specified emacs version" )
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep # defaults to latest
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep current
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs31
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs30
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs29
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs28
@@ -157,6 +159,7 @@ ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs26 tar
 $( examplesSeperatorSection "srcEnvSetup:: Setup (apt install) Needed Packages For Buidling" )
 ${G_myName} ${extraInfo} -i srcEnvSetup # defaults to latest
 ${G_myName} ${extraInfo} -i srcEnvSetup current
+${G_myName} ${extraInfo} -i srcEnvSetup emacs31
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs30
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs29
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs28
@@ -165,6 +168,7 @@ ${G_myName} ${extraInfo} -i srcEnvSetup emacs26
 $( examplesSeperatorSection "srcPkgObtain:: git clone or wget file.tar -- Get The Sources" )
 ${G_myName} ${extraInfo} -i srcPkgObtain # defaults to latest
 ${G_myName} ${extraInfo} -i srcPkgObtain current
+${G_myName} ${extraInfo} -i srcPkgObtain emacs31
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs30
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs29
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs28
@@ -173,6 +177,7 @@ ${G_myName} ${extraInfo} -i srcPkgObtain emacs26
 $( examplesSeperatorSection "srcBuild:: make config; make bootstrap -- Build With Sources" )
 ${G_myName} ${extraInfo} -i srcBuild # defaults to latest
 ${G_myName} ${extraInfo} -i srcBuild current
+${G_myName} ${extraInfo} -i srcBuild emacs31
 ${G_myName} ${extraInfo} -i srcBuild emacs30
 ${G_myName} ${extraInfo} -i srcBuild emacs29
 ${G_myName} ${extraInfo} -i srcBuild emacs28
@@ -181,6 +186,7 @@ ${G_myName} ${extraInfo} -i srcBuild emacs26
 $( examplesSeperatorChapter "srcBinInstall:: sudo make install -- Install Build Results" )
 ${G_myName} ${extraInfo} -i srcBinInstall # defaults to latest
 ${G_myName} ${extraInfo} -i srcBinInstall current
+${G_myName} ${extraInfo} -i srcBinInstall emacs31
 ${G_myName} ${extraInfo} -i srcBinInstall emacs30
 ${G_myName} ${extraInfo} -i srcBinInstall emacs29
 ${G_myName} ${extraInfo} -i srcBinInstall emacs28
@@ -189,6 +195,7 @@ ${G_myName} ${extraInfo} -i srcBinInstall emacs26
 $( examplesSeperatorChapter "postInstall:: " )
 ${G_myName} ${extraInfo} -i postInstall # defaults to latest
 ${G_myName} ${extraInfo} -i postInstall current
+${G_myName} ${extraInfo} -i postInstall emacs31
 ${G_myName} ${extraInfo} -i postInstall emacs30
 ${G_myName} ${extraInfo} -i postInstall emacs29
 ${G_myName} ${extraInfo} -i postInstall emacs28
@@ -198,6 +205,7 @@ $( examplesSeperatorChapter "srcFullBuild:: srcEnvSetup + obtain + build + insta
 $( examplesSeperatorChapter "srcFullBuild:: when rebuilding is desired specify -f (forceMode) " )
 ${G_myName} ${extraInfo} -i srcFullBuild # defaults to latest
 ${G_myName} ${extraInfo} -i srcFullBuild current
+${G_myName} ${extraInfo} -i srcFullBuild emacs31
 ${G_myName} ${extraInfo} -i srcFullBuild emacs30
 ${G_myName} ${extraInfo} -i srcFullBuild emacs29
 ${G_myName} ${extraInfo} -i srcFullBuild emacs28
@@ -206,6 +214,7 @@ ${G_myName} ${extraInfo} -i srcFullBuild emacs26
 $( examplesSeperatorChapter "Installation Verification:: Is Specified Emacs Installed?" )
 ${G_myName} ${extraInfo} -i installedVerify # defaults to latest
 ${G_myName} ${extraInfo} -i installedVerify current
+${G_myName} ${extraInfo} -i installedVerify emacs31
 ${G_myName} ${extraInfo} -i installedVerify emacs30
 ${G_myName} ${extraInfo} -i installedVerify emacs29
 ${G_myName} ${extraInfo} -i installedVerify emacs28
@@ -214,6 +223,7 @@ ${G_myName} ${extraInfo} -i installedVerify emacs26
 $( examplesSeperatorChapter "Set as default:: /usr/local/bin/{emacs,emacsclient}" )
 ${G_myName} ${extraInfo} -i setAsDefault  # defaults to latest
 ${G_myName} ${extraInfo} -i setAsDefault current
+${G_myName} ${extraInfo} -i setAsDefault emacs31
 ${G_myName} ${extraInfo} -i setAsDefault emacs30
 ${G_myName} ${extraInfo} -i setAsDefault emacs29
 ${G_myName} ${extraInfo} -i setAsDefault emacs28
@@ -269,6 +279,23 @@ _EOF_
    
     opDo emacsVerCanonicalized    
 
+    function srcPkgSpecPrep_emacs31_git {
+        srcPkgName="emacs-31"
+
+        srcBuildScript=""
+        srcBuildScriptTmpDir=/tmp/"${srcPkgName}"
+        distEmacsTarUrl="NA"
+
+        srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
+        # -- depth 1 of git clone, copies only the latest revision
+        obtainCmndLine="git clone  --depth 1 -b ${srcPkgName} https://git.savannah.gnu.org/git/emacs.git"
+        prepCmndLine="echo Git cloned"
+
+        srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
+
+        buildConfigOptions="--with-tree-sitter --with-native-compilation"
+    }
+
     function srcPkgSpecPrep_emacs30_git {
         srcPkgName="emacs-30"
 
@@ -286,10 +313,9 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        #buildConfigOptions="--with-tree-sitter --with-native-compilation"
-        buildConfigOptions="--with-tree-sitter"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation"
     }
-    
+
     function srcPkgSpecPrep_emacs29_git {
         srcPkgName="emacs-29.4"
        
@@ -379,7 +405,10 @@ _EOF_
         fi
     }
 
-    if [ "${srcPkgSelector}" == "emacs30" ] ; then
+    if [ "${srcPkgSelector}" == "emacs31" ] ; then
+        opDoRet srcPkgSpecPrep_dispatch emacs31 ${srcObtainForm}
+
+    elif [ "${srcPkgSelector}" == "emacs30" ] ; then
         opDoRet srcPkgSpecPrep_dispatch emacs30 ${srcObtainForm}
 
     elif [ "${srcPkgSelector}" == "emacs29" ] ; then
@@ -881,12 +910,71 @@ _EOF_
         opDo apt-get -y install  zlib1g
         # ----- END  (emacs (26) on Debian 11) ------------
 
+    elif [ "${opRunDistGeneration}" == "13" ] ; then
+
+        #
+        # This is debian 13 (trixie)
+        # -------- Development Pkgs -----------
+        #
+        opDo apt-get -y build-dep emacs
+
+        # emacs as distributed with Debian 13
+        #  apt-cache depends emacs-gtk | grep Depends: | grep -v emacs | cut -d ':' -f 2 | sed -e 's/^/opDo apt-get -y install /'
+        # ----- BEGIN  (emacs on Debian 13) ------------
+        # -------- Run Time Pkgs -----------
+
+        opDo apt-get -y install  libacl1
+        opDo apt-get -y install  libasound2
+        opDo apt-get -y install  libatk1.0-0
+        opDo apt-get -y install  libc6
+        opDo apt-get -y install  libcairo-gobject2
+        opDo apt-get -y install  libcairo2
+        opDo apt-get -y install  libdbus-1-3
+        opDo apt-get -y install  libfontconfig1
+        opDo apt-get -y install  libfreetype6
+        opDo apt-get -y install  libgdk-pixbuf2.0-0
+        opDo apt-get -y install  libgif7
+        opDo apt-get -y install  libglib2.0-0
+        opDo apt-get -y install  libgnutls30
+        opDo apt-get -y install  libgomp1
+        opDo apt-get -y install  libgpm2
+        opDo apt-get -y install  libgtk-3-0
+        opDo apt-get -y install  libice6
+        opDo apt-get -y install  libjpeg62-turbo
+        opDo apt-get -y install  liblcms2-2
+        opDo apt-get -y install  libm17n-0
+        opDo apt-get -y install  libmagickcore-6.q16-6
+        opDo apt-get -y install  libmagickwand-6.q16-6
+        opDo apt-get -y install  libotf0
+        opDo apt-get -y install  libpango-1.0-0
+        opDo apt-get -y install  libpangocairo-1.0-0
+        opDo apt-get -y install  libpng16-16
+        opDo apt-get -y install  librsvg2-2
+        opDo apt-get -y install  libselinux1
+        opDo apt-get -y install  libsm6
+        opDo apt-get -y install  libsystemd0
+        opDo apt-get -y install  libtiff6
+        opDo apt-get -y install  libtinfo6
+        opDo apt-get -y install  libx11-6
+        opDo apt-get -y install  libx11-xcb1
+        opDo apt-get -y install  libxcb1
+        opDo apt-get -y install  libxext6
+        opDo apt-get -y install  libxfixes3
+        opDo apt-get -y install  libxft2
+        opDo apt-get -y install  libxinerama1
+        opDo apt-get -y install  libxml2
+        opDo apt-get -y install  libxpm4
+        opDo apt-get -y install  libxrandr2
+        opDo apt-get -y install  libxrender1
+        opDo apt-get -y install  zlib1g
+        # ----- END  (emacs on Debian 13) ------------
 
     else
         EH_problem "Unsupported Distro and DistroGeneration=${opRunDistGeneration}"
     fi
 }
 
+function vis_srcEnvSetup_emacs31 { opDo vis_srcEnvSetup_emacs27; }
 function vis_srcEnvSetup_emacs30 { opDo vis_srcEnvSetup_emacs27; }
 function vis_srcEnvSetup_emacs29 { opDo vis_srcEnvSetup_emacs27; }
 function vis_srcEnvSetup_emacs28 { opDo vis_srcEnvSetup_emacs27; }
@@ -967,7 +1055,54 @@ _EOF_
 
         opDo apt-get -y install  libm17n-dev
         opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
-        
+
+    elif [ "${opRunDistGeneration}" == "12" ] ; then
+        #
+
+        opDo apt-get -y install  libjpeg-dev
+        opDo apt-get -y install  libtiff-dev
+        opDo apt-get -y install  libncurses5-dev
+        opDo apt-get -y install  libgif-dev
+        opDo apt-get -y install  libpng-dev
+        opDo apt-get -y install  librsvg2-dev
+        opDo apt-get -y install  libotf-dev
+
+        opDo apt-get -y install  libgnutls28-dev # NOTYET double check on need for this
+
+        # Debian 12 renamed the webkit dev package from 4.0 to 4.1
+        opDo apt-get -y install  libwebkit2gtk-4.1-dev
+
+        opDo apt-get -y install  libm17n-dev
+        opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
+
+        # libgccjit must match the default gcc major version -- needed for --with-native-compilation
+        local gccMajorVer=$( gcc -dumpversion | cut -d '.' -f 1 )
+        opDo apt-get -y install  gcc-${gccMajorVer}
+        opDo apt-get -y install  libgccjit-${gccMajorVer}-dev
+
+    elif [ "${opRunDistGeneration}" == "13" ] ; then
+        #
+
+        opDo apt-get -y install  libjpeg-dev
+        opDo apt-get -y install  libtiff-dev
+        opDo apt-get -y install  libncurses-dev
+        opDo apt-get -y install  libgif-dev
+        opDo apt-get -y install  libpng-dev
+        opDo apt-get -y install  librsvg2-dev
+        opDo apt-get -y install  libotf-dev
+
+        opDo apt-get -y install  libgnutls28-dev # NOTYET double check on need for this
+
+        opDo apt-get -y install  libwebkit2gtk-4.1-dev
+
+        opDo apt-get -y install  libm17n-dev
+        opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
+
+        # libgccjit must match the default gcc major version -- needed for --with-native-compilation
+        local gccMajorVer=$( gcc -dumpversion | cut -d '.' -f 1 )
+        opDo apt-get -y install  gcc-${gccMajorVer}
+        opDo apt-get -y install  libgccjit-${gccMajorVer}-dev
+
     elif [ "${opRunDistGeneration}" == "1804" ] ; then
         #
 
@@ -1282,6 +1417,7 @@ _EOF_
     inBaseDirDo ${srcTreeSitterBuildDir} sudo make install
 }
 
+function vis_srcBuild_emacs31 { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs30 { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs29 { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs28 { opDo vis_srcBuild_default; }
@@ -1572,6 +1708,9 @@ _EOF_
 
     if [ ${retVal} == 0 ] ; then
         opDo ls -l /usr/local/bin/emacs-${emacsVersion} /usr/local/bin/emacsclient-${emacsVersion}
+
+        local nativeCompAvailable=$( /usr/local/bin/emacs-${emacsVersion} -Q --batch --eval '(message "%s" (native-comp-available-p))' 2>&1 )
+        ANT_raw "native-comp-available-p: ${nativeCompAvailable}"
     else
         ANT_raw "/usr/local/bin/emacs-${emacsVersion} has not been installed"
     fi

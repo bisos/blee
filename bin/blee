@@ -138,7 +138,7 @@ $( examplesSeperatorChapter "Doom and Doom-Blee" )
 bleeDoomsManage.sh
 bleeDoomsManage.sh ${extraInfo} -p profile=doom-blee3 -i reBuild    # doomReBuildBlee
 $( examplesSeperatorChapter "Attach to running Blee" )
-emacsclient --socket-name=$(ls -dt /tmp/emacs1000/* | head -2 | tail -1) -nw
+emacsclient --socket-name=$(ls -t /tmp/emacs1000/* | head -1) -nw
 _EOF_
 }
 

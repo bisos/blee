@@ -228,6 +228,8 @@ _EOF_
 
     if [ -f "$1" ] ; then
         opDo ${thisEmacsClient} -n --eval "(find-file \"$1\")"
+    elif [ "$1" == "nw" ] ; then
+        emacsclient --socket-name=$(ls -t /tmp/emacs1000/* | head -1) -nw
     else
         opDo ${thisEmacsClient} "$1"
     fi
