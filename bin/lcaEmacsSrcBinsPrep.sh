@@ -325,7 +325,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacs31_branch {
@@ -343,7 +343,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacsNext_git {
@@ -373,7 +373,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacs30_git {
@@ -393,7 +393,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacs30_branch {
@@ -410,7 +410,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacs29_git {
@@ -431,7 +431,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot --with-x-toolkit=gtk3 --with-selinux --with-lcms2"
     }
 
     function srcPkgSpecPrep_emacs28_git {
@@ -1244,7 +1244,33 @@ _EOF_
         # cairo/gtk3/harfbuzz but deliberately NOT xwidgets, because an embedded WebKit fault
         # is an Emacs fault. Use eww for in-buffer browsing. See <<xwidgetsPolicy>> below.
 
+        # <2026-09-07> These three were previously obtained TRANSITIVELY through
+        # libwebkit2gtk-4.1-dev. When that was dropped, configure silently fell back to
+        # the Lucid toolkit and dropped SQLITE3 and DBUS. They are now explicit.
+        opDo apt-get -y install  libgtk-3-dev     # X toolkit -- without it configure falls back to Lucid
+        opDo apt-get -y install  libsqlite3-dev   # HAVE_SQLITE3 -- org-roam, forge, etc.
+        opDo apt-get -y install  libdbus-1-dev    # HAVE_DBUS -- notifications, secrets service
+
         opDo apt-get -y install  libselinux1-dev  # Debian's emacs has LIBSELINUX; preserves contexts
+
+        # <2026-09-07> libacl1-dev: POSIX ACLs. file-acl/set-file-acl are defined even WITHOUT
+        # this and silently return nil, so an ACL on a file is dropped when emacs saves it
+        # (emacs writes a temp file and renames over the original). Debian's emacs-gtk has ACL.
+        # Verified: on a file carrying "user:nobody:rw-", debian's emacs reports the ACL and an
+        # ACL-less build reports nil. Matters here because /bisos is shared across accounts.
+        opDo apt-get -y install  libacl1-dev
+
+        # <2026-09-07> liblcms2-dev: Little CMS 2 -- gives lcms-cie-de2000 (CIEDE2000 perceptual
+        # colour difference) and the lcms-xyz->jch / lcms-temp->white-point family. Debian has
+        # LCMS2. Nothing in blee uses it today; taken for parity, and it needs --with-lcms2
+        # passed explicitly (unlike ACL, it is not enabled by mere autodetection).
+        opDo apt-get -y install  liblcms2-dev
+
+        # DELIBERATELY NOT INSTALLED: libgpm-dev. GPM is mouse support on the bare Linux
+        # virtual console only. Inside a terminal emulator or over ssh emacs uses
+        # xterm-mouse-mode, which needs no gpm; blee references xterm-mouse and never
+        # gpm-mouse/t-mouse, the gpm daemon is not installed and /dev/gpmctl does not exist.
+        # Debian enables it because Debian ships to console users. We do not.
 
         opDo apt-get -y install  libm17n-dev
         opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
@@ -1270,7 +1296,33 @@ _EOF_
         # <2026-09-07> libwebkit2gtk-4.1-dev REMOVED -- see the Deb 12 block above and
         # <<xwidgetsPolicy>>. Not passed to configure, so it bought nothing.
 
+        # <2026-09-07> These three were previously obtained TRANSITIVELY through
+        # libwebkit2gtk-4.1-dev. When that was dropped, configure silently fell back to
+        # the Lucid toolkit and dropped SQLITE3 and DBUS. They are now explicit.
+        opDo apt-get -y install  libgtk-3-dev     # X toolkit -- without it configure falls back to Lucid
+        opDo apt-get -y install  libsqlite3-dev   # HAVE_SQLITE3 -- org-roam, forge, etc.
+        opDo apt-get -y install  libdbus-1-dev    # HAVE_DBUS -- notifications, secrets service
+
         opDo apt-get -y install  libselinux1-dev  # Debian's emacs has LIBSELINUX; preserves contexts
+
+        # <2026-09-07> libacl1-dev: POSIX ACLs. file-acl/set-file-acl are defined even WITHOUT
+        # this and silently return nil, so an ACL on a file is dropped when emacs saves it
+        # (emacs writes a temp file and renames over the original). Debian's emacs-gtk has ACL.
+        # Verified: on a file carrying "user:nobody:rw-", debian's emacs reports the ACL and an
+        # ACL-less build reports nil. Matters here because /bisos is shared across accounts.
+        opDo apt-get -y install  libacl1-dev
+
+        # <2026-09-07> liblcms2-dev: Little CMS 2 -- gives lcms-cie-de2000 (CIEDE2000 perceptual
+        # colour difference) and the lcms-xyz->jch / lcms-temp->white-point family. Debian has
+        # LCMS2. Nothing in blee uses it today; taken for parity, and it needs --with-lcms2
+        # passed explicitly (unlike ACL, it is not enabled by mere autodetection).
+        opDo apt-get -y install  liblcms2-dev
+
+        # DELIBERATELY NOT INSTALLED: libgpm-dev. GPM is mouse support on the bare Linux
+        # virtual console only. Inside a terminal emulator or over ssh emacs uses
+        # xterm-mouse-mode, which needs no gpm; blee references xterm-mouse and never
+        # gpm-mouse/t-mouse, the gpm daemon is not installed and /dev/gpmctl does not exist.
+        # Debian enables it because Debian ships to console users. We do not.
 
         opDo apt-get -y install  libm17n-dev
         opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
