@@ -455,11 +455,43 @@ function doomPinForEmacsMajor {
 
     case ${emacsMajor} in
         28)
-            # testedAgainst: emacs 28.x   testedOn: <2023-12-08>  status: FROZEN
-            # sha1 obtained Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
-            # Do not move this without re-testing blee on emacs28.
+            # STATUS <2026-09-07> :: emacs28 + doom is a DEAD END. Pin restored to the
+            # historic Dec-2023 value below, but be aware it does NOT currently rebuild.
+            # NOT retired --- retirement deferred until blee-31 has been used in anger.
+            #
+            # Two constraints bracket emacs 28 with no gap between them:
+            #
+            #   07eae6450 2024-09-09  doom moved git-commit into magit.
+            #                         BEFORE this, doom declares (package! git-commit ...),
+            #                         but current MELPA deleted that standalone recipe, so
+            #                         the build dies: "Could not find package git-commit".
+            #   b4917ef4f 2026-03-10  setopt (an Emacs 29.1 macro) enters doom modules.
+            #   6d5575144 2026-06-11  doom first declares the 29.1 library requirement.
+            #   0c24887bb 2026-08-29  29.1 enforced for interactive use.
+            #
+            # So: before 2024-09 doom runs on 28 but cannot RESOLVE against today's MELPA;
+            # after 2024-09 it resolves but needs Emacs 29 APIs. Tested, not assumed:
+            #
+            #   latest (01d68aaf6) -> BUILT clean in 5m53s, then refused to start:
+            #       "Detected Emacs 28.2, but interactive Doom needs >=29.1"
+            #   7ef14e58c (2026-06-11, newest declaring 28.1+) -> BUILT clean in 5m59s,
+            #       then died at runtime: (void-function setopt)
+            #
+            # And there is no earlier escape: scanning seven commits across 2024-09..2026-03,
+            # doom modules ALWAYS use defvar-keymap and with-memoization (both Emacs 29.1),
+            # in completion/vertico, lang/emacs-lisp, lang/org and ui/indent-guides --- every
+            # one of which doom-base-blee3/init.el enables. The 2026-08-29 guard did not take
+            # emacs28 away; it stopped you discovering this one void-function at a time.
+            #
+            # TO MAKE emacs28 BUILD AGAIN you must ALSO pin the straight recipe repositories
+            # to a Dec-2023-era state (melpa, gnu-elpa-mirror, nongnu-elpa, el-get,
+            # emacsmirror-mirror, straight.el). Pinning doom alone is not enough --- that is
+            # the whole lesson here. Until then this pin is correct but not buildable.
+            #
+            # sha1 obtained Fri Dec 8 12:13:10 2023 from a stable release.
             echo "03d692f129633e3bf0bd100d91b3ebf3f77db6d1"
             ;;
+
         31)
             # testedAgainst: emacs 31.1.50   testedOn: <2026-09-06 Sun>   status: PROVEN
             # doom 01d68aaf6 (2026-09-05 "docs: add warning about doomemacs.com").
