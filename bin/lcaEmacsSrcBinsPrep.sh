@@ -146,12 +146,19 @@ $( examplesSeperatorTopLabel "${G_myName}" )
 $( examplesSeperatorChapter "Full Service" )
 ${G_myName} ${extraInfo} -i srcFullBuild
 $( examplesSeperatorChapter "Build In Steps With srcPkgSelector" )
-As of 2022-05-22 srcPkgSelector is one of: emacsVer =  latest current emacs29 emacs28 emacs27 emacs26
+srcPkgSelector is one of: latest current emacsNext emacs31 emacs30 emacs29 emacs28 emacs27 emacs26
+  emacsNext = emacs MASTER, bleeding edge, for testing latest features. Moves; NOT reproducible.
+  emacsNN   = RELEASED tag by default (eg emacs31 -> emacs-31.1). Add "branch" for the daily tip.
+  latest    = ${emacsVerLatest} -- deliberately a RELEASED version, never emacsNext.
+srcObtainForm is one of: git (default, RELEASED tag) | branch (DAILY branch tip) | tar (historic)
 $( examplesSeperatorSection "srcPkgSpecPrep:: determine driving params for specified emacs version" )
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep # defaults to latest
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep current
-${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs31
-${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs30
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacsNext              # BLEEDING EDGE -- master, for testing latest
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs31                # RELEASED -- tag emacs-31.1
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs31 branch         # DAILY -- tip of emacs-31, moving
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs30                # RELEASED -- tag emacs-30.2
+${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs30 branch         # DAILY -- tip of emacs-30, moving
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs29
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs28
 ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs27
@@ -159,6 +166,7 @@ ${G_myName} ${extraInfo} -i srcPkgSpecPrep emacs26 tar
 $( examplesSeperatorSection "srcEnvSetup:: Setup (apt install) Needed Packages For Buidling" )
 ${G_myName} ${extraInfo} -i srcEnvSetup # defaults to latest
 ${G_myName} ${extraInfo} -i srcEnvSetup current
+${G_myName} ${extraInfo} -i srcEnvSetup emacsNext
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs31
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs30
 ${G_myName} ${extraInfo} -i srcEnvSetup emacs29
@@ -168,6 +176,7 @@ ${G_myName} ${extraInfo} -i srcEnvSetup emacs26
 $( examplesSeperatorSection "srcPkgObtain:: git clone or wget file.tar -- Get The Sources" )
 ${G_myName} ${extraInfo} -i srcPkgObtain # defaults to latest
 ${G_myName} ${extraInfo} -i srcPkgObtain current
+${G_myName} ${extraInfo} -i srcPkgObtain emacsNext
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs31
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs30
 ${G_myName} ${extraInfo} -i srcPkgObtain emacs29
@@ -177,6 +186,7 @@ ${G_myName} ${extraInfo} -i srcPkgObtain emacs26
 $( examplesSeperatorSection "srcBuild:: make config; make bootstrap -- Build With Sources" )
 ${G_myName} ${extraInfo} -i srcBuild # defaults to latest
 ${G_myName} ${extraInfo} -i srcBuild current
+${G_myName} ${extraInfo} -i srcBuild emacsNext
 ${G_myName} ${extraInfo} -i srcBuild emacs31
 ${G_myName} ${extraInfo} -i srcBuild emacs30
 ${G_myName} ${extraInfo} -i srcBuild emacs29
@@ -186,6 +196,7 @@ ${G_myName} ${extraInfo} -i srcBuild emacs26
 $( examplesSeperatorChapter "srcBinInstall:: sudo make install -- Install Build Results" )
 ${G_myName} ${extraInfo} -i srcBinInstall # defaults to latest
 ${G_myName} ${extraInfo} -i srcBinInstall current
+${G_myName} ${extraInfo} -i srcBinInstall emacsNext
 ${G_myName} ${extraInfo} -i srcBinInstall emacs31
 ${G_myName} ${extraInfo} -i srcBinInstall emacs30
 ${G_myName} ${extraInfo} -i srcBinInstall emacs29
@@ -195,6 +206,7 @@ ${G_myName} ${extraInfo} -i srcBinInstall emacs26
 $( examplesSeperatorChapter "postInstall:: " )
 ${G_myName} ${extraInfo} -i postInstall # defaults to latest
 ${G_myName} ${extraInfo} -i postInstall current
+${G_myName} ${extraInfo} -i postInstall emacsNext
 ${G_myName} ${extraInfo} -i postInstall emacs31
 ${G_myName} ${extraInfo} -i postInstall emacs30
 ${G_myName} ${extraInfo} -i postInstall emacs29
@@ -205,6 +217,7 @@ $( examplesSeperatorChapter "srcFullBuild:: srcEnvSetup + obtain + build + insta
 $( examplesSeperatorChapter "srcFullBuild:: when rebuilding is desired specify -f (forceMode) " )
 ${G_myName} ${extraInfo} -i srcFullBuild # defaults to latest
 ${G_myName} ${extraInfo} -i srcFullBuild current
+${G_myName} ${extraInfo} -i srcFullBuild emacsNext
 ${G_myName} ${extraInfo} -i srcFullBuild emacs31
 ${G_myName} ${extraInfo} -i srcFullBuild emacs30
 ${G_myName} ${extraInfo} -i srcFullBuild emacs29
@@ -214,6 +227,7 @@ ${G_myName} ${extraInfo} -i srcFullBuild emacs26
 $( examplesSeperatorChapter "Installation Verification:: Is Specified Emacs Installed?" )
 ${G_myName} ${extraInfo} -i installedVerify # defaults to latest
 ${G_myName} ${extraInfo} -i installedVerify current
+${G_myName} ${extraInfo} -i installedVerify emacsNext
 ${G_myName} ${extraInfo} -i installedVerify emacs31
 ${G_myName} ${extraInfo} -i installedVerify emacs30
 ${G_myName} ${extraInfo} -i installedVerify emacs29
@@ -223,6 +237,7 @@ ${G_myName} ${extraInfo} -i installedVerify emacs26
 $( examplesSeperatorChapter "Set as default:: /usr/local/bin/{emacs,emacsclient}" )
 ${G_myName} ${extraInfo} -i setAsDefault  # defaults to latest
 ${G_myName} ${extraInfo} -i setAsDefault current
+${G_myName} ${extraInfo} -i setAsDefault emacsNext
 ${G_myName} ${extraInfo} -i setAsDefault emacs31
 ${G_myName} ${extraInfo} -i setAsDefault emacs30
 ${G_myName} ${extraInfo} -i setAsDefault emacs29
@@ -279,7 +294,43 @@ _EOF_
    
     opDo emacsVerCanonicalized    
 
+    #
+    # emacs31 comes in two forms. RELEASED is the default; DAILY must be asked for by name.
+    #
+    #   -i srcPkgSpecPrep emacs31           -> _git    -> tag emacs-31.1   (RELEASED)
+    #   -i srcPkgSpecPrep emacs31 branch    -> _branch -> tip of emacs-31  (DAILY)
+    #
+    # Emacs makes real releases, so the tag is hardcoded here and there is deliberately NO
+    # pin table for emacs sources. (Contrast doomPinTable in bleeLib.sh, which exists only
+    # because doom makes no releases, so the emacs<->doom correlation has to be recorded
+    # somewhere. An emacs tag records nothing we discovered --- "31.1" already denotes it.)
+    #
+    # Each form gets its OWN srcObtainBaseDir so released and daily trees coexist and neither
+    # clone fails against the other's directory.
+    #
     function srcPkgSpecPrep_emacs31_git {
+        # RELEASED. The .50 in a version means development snapshot, so the emacs-31 BRANCH
+        # reports 31.1.50 == "after 31.1, heading for 31.2" --- NOT the release. The tag is.
+        srcPkgName="emacs-31.1"
+        local srcGitTag="emacs-31.1"
+
+        srcBuildScript=""
+        srcBuildScriptTmpDir=/tmp/"${srcPkgName}"
+        distEmacsTarUrl="NA"
+
+        srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
+        # --depth 1 against a TAG: cheap, and unlike a branch clone the tree can identify itself.
+        obtainCmndLine="git clone  --depth 1 -b ${srcGitTag} https://git.savannah.gnu.org/git/emacs.git"
+        prepCmndLine="echo Git cloned at tag ${srcGitTag}"
+
+        srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
+
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+    }
+
+    function srcPkgSpecPrep_emacs31_branch {
+        # DAILY. Tip of the emacs-31 release branch --- a MOVING target that advances daily.
+        # Use this to pick up a fix before it is released. Builds are NOT reproducible.
         srcPkgName="emacs-31"
 
         srcBuildScript=""
@@ -287,16 +338,66 @@ _EOF_
         distEmacsTarUrl="NA"
 
         srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
-        # -- depth 1 of git clone, copies only the latest revision
         obtainCmndLine="git clone  --depth 1 -b ${srcPkgName} https://git.savannah.gnu.org/git/emacs.git"
-        prepCmndLine="echo Git cloned"
+        prepCmndLine="echo Git cloned at BRANCH TIP of ${srcPkgName} -- moving target, not reproducible"
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+    }
+
+    function srcPkgSpecPrep_emacsNext_git {
+        # BLEEDING EDGE -- tracks emacs MASTER, for testing latest features.
+        #
+        # Deliberately NOT reproducible: that is the entire point. Everything else in this
+        # script is pinned to a release tag; emacsNext is the one that moves. Never use it
+        # as a regression-rebuild baseline (Stage 4) and never make it emacsVerLatest.
+        #
+        # There is no fixed version number. master reports 32.0.50 as of <2026-09-07> and
+        # will roll forward, so the version is derived from the built tree --- see
+        # emacsVersionOfSelector. It installs as emacs-<major> like any other version, so
+        # once built you use it via -p emacs=32 (blee, bleeDoomsManage.sh) exactly as usual.
+        # doomPinTable has no entry for it, so it correctly gets an UNPINNED doom, which is
+        # the right pairing for a bleeding-edge emacs.
+        srcPkgName="emacs-next"
+
+        srcBuildScript=""
+        srcBuildScriptTmpDir=/tmp/"${srcPkgName}"
+        distEmacsTarUrl="NA"
+
+        srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
+        # A daily target must UPDATE on re-obtain, not fail against an existing checkout the
+        # way a bare "git clone" does. Hence a function rather than a one-shot command.
+        obtainCmndLine="obtainOrUpdateSrc_emacsNext"
+        prepCmndLine="echo Obtained emacs MASTER -- bleeding edge, version and content move"
+
+        srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
+
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
     }
 
     function srcPkgSpecPrep_emacs30_git {
+        # RELEASED -- tag emacs-30.2, the latest emacs-30 release as of <2026-09-07>.
+        # Was "-b emacs-30", the branch tip, which reports 30.2.50 == a development snapshot
+        # after 30.2, NOT the release. Same defect emacs31 had.
+        srcPkgName="emacs-30.2"
+        local srcGitTag="emacs-30.2"
+
+        srcBuildScript=""
+        srcBuildScriptTmpDir=/tmp/"${srcPkgName}"
+        distEmacsTarUrl="NA"
+
+        srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
+        obtainCmndLine="git clone  --depth 1 -b ${srcGitTag} https://git.savannah.gnu.org/git/emacs.git"
+        prepCmndLine="echo Git cloned at tag ${srcGitTag}"
+
+        srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
+
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
+    }
+
+    function srcPkgSpecPrep_emacs30_branch {
+        # DAILY -- tip of the emacs-30 release branch. Moving target, not reproducible.
         srcPkgName="emacs-30"
 
         srcBuildScript=""
@@ -304,16 +405,12 @@ _EOF_
         distEmacsTarUrl="NA"
 
         srcObtainBaseDir="/bisos/var/srcPkgs/${srcPkgName}"
-        # -- depth 1 of git clone, copies only the latest revision
-        #obtainCmndLine="git clone --depth 1 git://git.sv.gnu.org/emacs.git"
-        #obtainCmndLine="obtainOrUpdateSrc_emacs29"
-        #
         obtainCmndLine="git clone  --depth 1 -b ${srcPkgName} https://git.savannah.gnu.org/git/emacs.git"
-        prepCmndLine="echo Git cloned"
+        prepCmndLine="echo Git cloned at BRANCH TIP of ${srcPkgName} -- moving target, not reproducible"
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
     }
 
     function srcPkgSpecPrep_emacs29_git {
@@ -334,7 +431,7 @@ _EOF_
 
         srcBuildBaseDir="/bisos/var/srcPkgs/${srcPkgName}/emacs"
 
-        buildConfigOptions="--with-tree-sitter --with-native-compilation"
+        buildConfigOptions="--with-tree-sitter --with-native-compilation=aot"
     }
 
     function srcPkgSpecPrep_emacs28_git {
@@ -396,16 +493,24 @@ _EOF_
         local srcObtainForm="$2"
         
         if [ "${srcObtainForm}" == "git" ] ; then
+            # Default. Released sources -- a tag, hardcoded in the per-version _git function.
             opDo srcPkgSpecPrep_${emacsVer}_git
+        elif [ "${srcObtainForm}" == "branch" ] ; then
+            # Opt-in only. Tip of the release branch == today's daily. Not reproducible.
+            opDo srcPkgSpecPrep_${emacsVer}_branch
         elif [ "${srcObtainForm}" == "tar" ] ; then
+            # Historic. Release tarballs from ftp.gnu.org. Only emacs28 has a _tar form.
             opDo srcPkgSpecPrep_${emacsVer}_tar
         else
-            EH_problem "Bad srcObtainForm -- specify srcObtainForm='git|tar'"
+            EH_problem "Bad srcObtainForm -- specify srcObtainForm='git|branch|tar'"
             lpReturn 101
         fi
     }
 
-    if [ "${srcPkgSelector}" == "emacs31" ] ; then
+    if [ "${srcPkgSelector}" == "emacsNext" ] ; then
+        opDoRet srcPkgSpecPrep_dispatch emacsNext ${srcObtainForm}
+
+    elif [ "${srcPkgSelector}" == "emacs31" ] ; then
         opDoRet srcPkgSpecPrep_dispatch emacs31 ${srcObtainForm}
 
     elif [ "${srcPkgSelector}" == "emacs30" ] ; then
@@ -472,6 +577,59 @@ _CommentBegin_
 * TODO [[elisp:(show-all)][(>]] [[elisp:(blee:menu-sel:outline:popupMenu)][+-]] [[elisp:(blee:menu-sel:navigation:popupMenu)][==]]     [[elisp:(lsip-local-run-command "apt-cache depends emacs25")][apt-cache depends emacs25]] ~||~  =List of needed packages for emacs=   [[elisp:(org-shifttab)][<)]] E|
 _CommentEnd_
 ####+END:
+
+function obtainOrUpdateSrc_emacsNext {
+    # Referenced as obtainCmndLine by srcPkgSpecPrep_emacsNext_git.
+    # Clone once; thereafter fetch+reset so that a re-obtain picks up today's master.
+    # Absolute paths throughout, since this runs via inBaseDirDo.
+    local nextBase="/bisos/var/srcPkgs/emacs-next"
+    local nextSrc="${nextBase}/emacs"
+
+    if [ ! -d "${nextSrc}" ] ; then
+        opDoExit mkdir -p ${nextBase}
+        inBaseDirDo ${nextBase} git clone --depth 1 -b master https://git.savannah.gnu.org/git/emacs.git
+    else
+        inBaseDirDo ${nextSrc} git fetch --depth 1 origin master
+        inBaseDirDo ${nextSrc} git reset --hard FETCH_HEAD
+    fi
+
+    if [ ! -d "${nextSrc}" ] ; then
+        EH_problem "obtainOrUpdateSrc_emacsNext failed -- missing ${nextSrc}"
+        lpReturn 101
+    fi
+
+    local nextHead=$( git -C ${nextSrc} log -1 --format='%h %ci' )
+    local nextVer=$( grep -m1 "^AC_INIT" ${nextSrc}/configure.ac | sed -e 's/.*GNU Emacs\], *\[//' -e 's/\].*//' )
+    ANT_raw "emacsNext now at: ${nextHead} -- reports version ${nextVer}"
+
+    lpReturn
+}
+
+function emacsVersionOfSelector {
+    # Returns the emacs MAJOR version that ${srcPkgSelector} installs as.
+    #
+    # For emacsNN this is simply NN --- the historic ${srcPkgSelector##emacs}.
+    # For emacsNext there IS no fixed number: it tracks master, which today reports 32.0.50
+    # and will become 33.x in due course. So read it out of the obtained source tree's
+    # configure.ac (AC_INIT([GNU Emacs], [32.0.50], ...)) rather than hardcoding anything.
+    #
+    # Callers must have run vis_srcPkgSpecPrep first, so srcBuildBaseDir is set.
+    local result="${srcPkgSelector##emacs}"
+
+    if [ "${result}" == "Next" ] ; then
+        result=""
+        if [ -f "${srcBuildBaseDir}/configure.ac" ] ; then
+            result=$( grep -m1 "^AC_INIT" ${srcBuildBaseDir}/configure.ac \
+                          | sed -e 's/.*GNU Emacs\], *\[//' -e 's/\..*//' )
+        fi
+        if [ -z "${result}" ] ; then
+            EH_problem "emacsNext: cannot determine version -- missing ${srcBuildBaseDir}/configure.ac"
+            EH_problem "Run -i srcPkgObtain emacsNext first."
+        fi
+    fi
+
+    echo ${result}
+}
 
 function emacsVerCanonicalized {
     if [ "${srcPkgSelector}" == "latest" ] ; then
@@ -974,10 +1132,17 @@ _EOF_
     fi
 }
 
-function vis_srcEnvSetup_emacs31 { opDo vis_srcEnvSetup_emacs27; }
-function vis_srcEnvSetup_emacs30 { opDo vis_srcEnvSetup_emacs27; }
-function vis_srcEnvSetup_emacs29 { opDo vis_srcEnvSetup_emacs27; }
-function vis_srcEnvSetup_emacs28 { opDo vis_srcEnvSetup_emacs27; }
+# <2026-09-07> These all delegate to one dependency set, which dispatches on the DEBIAN
+# generation (opRunDistGeneration), not on the emacs version. The old name
+# vis_srcEnvSetup_emacs27 was misleading: it is not emacs-27 specific and never was --- it is
+# where the Deb 12/13 + libgccjit logic lives. Renamed to say what it is; the emacs27 name is
+# kept as a thin alias so nothing that called it by name breaks.
+function vis_srcEnvSetup_emacsNext { opDo vis_srcEnvSetup_debianDeps; }
+function vis_srcEnvSetup_emacs31 { opDo vis_srcEnvSetup_debianDeps; }
+function vis_srcEnvSetup_emacs30 { opDo vis_srcEnvSetup_debianDeps; }
+function vis_srcEnvSetup_emacs29 { opDo vis_srcEnvSetup_debianDeps; }
+function vis_srcEnvSetup_emacs28 { opDo vis_srcEnvSetup_debianDeps; }
+function vis_srcEnvSetup_emacs27 { opDo vis_srcEnvSetup_debianDeps; }  # legacy alias
     
 
 _CommentBegin_
@@ -986,9 +1151,13 @@ _CommentEnd_
 
 #  apt-cache depends emacs-gtk | grep Depends: | grep -v emacs | cut -d ':' -f 2 | sed -e 's/^/opDo apt-get -y install /'
 
-function vis_srcEnvSetup_emacs27 {
+function vis_srcEnvSetup_debianDeps {
     G_funcEntry
     function describeF {  G_funcEntryShow; cat  << _EOF_
+** Install emacs build dependencies. Dispatches on the DEBIAN generation
+(opRunDistGeneration), NOT on the emacs version --- every supported emacs version
+uses the same dependency set for a given Debian generation.
+Was named vis_srcEnvSetup_emacs27, which was misleading.
 _EOF_
     }
     EH_assert [[ $# -eq 0 ]]
@@ -1069,8 +1238,13 @@ _EOF_
 
         opDo apt-get -y install  libgnutls28-dev # NOTYET double check on need for this
 
-        # Debian 12 renamed the webkit dev package from 4.0 to 4.1
-        opDo apt-get -y install  libwebkit2gtk-4.1-dev
+        # <2026-09-07> libwebkit2gtk-4.1-dev REMOVED. It is only needed for --with-xwidgets,
+        # which we do not pass, so it was a large dependency bought for nothing (HAVE_XWIDGETS
+        # was undef). Blee/BISOS policy parallels Debian here: Debian's own emacs-gtk enables
+        # cairo/gtk3/harfbuzz but deliberately NOT xwidgets, because an embedded WebKit fault
+        # is an Emacs fault. Use eww for in-buffer browsing. See <<xwidgetsPolicy>> below.
+
+        opDo apt-get -y install  libselinux1-dev  # Debian's emacs has LIBSELINUX; preserves contexts
 
         opDo apt-get -y install  libm17n-dev
         opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
@@ -1093,7 +1267,10 @@ _EOF_
 
         opDo apt-get -y install  libgnutls28-dev # NOTYET double check on need for this
 
-        opDo apt-get -y install  libwebkit2gtk-4.1-dev
+        # <2026-09-07> libwebkit2gtk-4.1-dev REMOVED -- see the Deb 12 block above and
+        # <<xwidgetsPolicy>>. Not passed to configure, so it bought nothing.
+
+        opDo apt-get -y install  libselinux1-dev  # Debian's emacs has LIBSELINUX; preserves contexts
 
         opDo apt-get -y install  libm17n-dev
         opDo apt-get -y install  libharfbuzz-dev     # shaping for farsi/arabic
@@ -1404,11 +1581,34 @@ _EOF_
 
     local srcTreeSitterBaseDir="/bisos/var/srcPkgs/emacsTreeSitter"
 
+    # <2026-09-07> tree-sitter is now PINNED to a release tag.
+    #
+    # It used to clone master with no -b, so a build picked up whatever upstream happened to
+    # be that day -- we landed on a "nightly" tag dated 2 days before the build. That is
+    # non-reproducible, which defeats the regression-rebuild goal of Stage 4.
+    #
+    # tree-sitter DOES make releases, so per the same rule used for the emacs sources the tag
+    # is hardcoded here and there is no pin table. (Contrast doomPinTable in bleeLib.sh, which
+    # exists only because doom makes no releases.)
+    #
+    # Debian 12 ships libtree-sitter-dev 0.20.7, which would be the more Debian-parallel
+    # choice, but it is from 2023 and old enough to limit grammar ABI compatibility for
+    # emacs 30/31. Building the pinned release keeps us current AND reproducible.
+    local srcTreeSitterTag="v0.27.0"
+
     opDo vis_srcPkgSpecPrep ${srcPkgSelector}
 
     opDoExit mkdir -p ${srcTreeSitterBaseDir}
 
-    inBaseDirDo ${srcTreeSitterBaseDir} git clone https://github.com/tree-sitter/tree-sitter.git
+    # Idempotent: clone once, then move the existing checkout to the pinned tag. Previously
+    # this re-cloned on EVERY build; the clone failed against the existing directory and the
+    # build then silently proceeded with whatever was already checked out.
+    if [ ! -d "${srcTreeSitterBaseDir}/tree-sitter" ] ; then
+        inBaseDirDo ${srcTreeSitterBaseDir} git clone https://github.com/tree-sitter/tree-sitter.git
+    fi
+
+    inBaseDirDo ${srcTreeSitterBaseDir}/tree-sitter git fetch --tags
+    inBaseDirDo ${srcTreeSitterBaseDir}/tree-sitter git checkout ${srcTreeSitterTag}
 
     local srcTreeSitterBuildDir="${srcTreeSitterBaseDir}/tree-sitter"
 
@@ -1417,6 +1617,7 @@ _EOF_
     inBaseDirDo ${srcTreeSitterBuildDir} sudo make install
 }
 
+function vis_srcBuild_emacsNext { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs31 { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs30 { opDo vis_srcBuild_default; }
 function vis_srcBuild_emacs29 { opDo vis_srcBuild_default; }
@@ -1444,10 +1645,30 @@ _EOF_
 
     inBaseDirDo ${srcBuildBaseDir} ./autogen.sh
 
-    # For ./configure we are accepting  --with-xwidgets 
+    # <<xwidgetsPolicy>> --- we deliberately do NOT pass --with-xwidgets.
+    #
+    # Blee/BISOS policy parallels Debian's. Debian's own emacs-gtk enables cairo, gtk3,
+    # harfbuzz, selinux, native-compilation and more, but NOT xwidgets. The reason: an
+    # xwidget embeds a live WebKitGTK widget IN the Emacs process, so a browser-engine
+    # fault becomes an Emacs fault -- historically around frame deletion and exit, which
+    # is exactly what a long-lived Blee session does constantly. Use eww for in-buffer
+    # browsing. libwebkit2gtk-*-dev was removed from srcEnvSetup accordingly.
+    #
+    # Native compilation is =aot --- this is a DELIBERATE DIVERGENCE from Debian, which uses
+    # bare --with-native-compilation. Debian ships to single-user desktops where a per-user
+    # ~/.emacs.d/eln-cache is fine. BISOS installs one emacs into a SHARED /usr/local used by
+    # many accounts on a node, so with bare native-comp every account re-JIT-compiles the same
+    # ~1550 non-preloaded lisp files, and doom-blee's first run makes that worse. AOT compiles
+    # them once into the system native-lisp dir. Cost: roughly 2-3x build time, once.
+    #
+    # NOTE: --with-native-compilation=aot is emacs 29+. emacs28 used make NATIVE_FULL_AOT=1
+    # and its spec sets no buildConfigOptions at all, so it is unaffected by this.
+    #
+    # Also deliberately NOT passed: --with-mailutils (Debian passes it; we do not want it).
     inBaseDirDo ${srcBuildBaseDir} ./configure  ${buildConfigOptions}
 
-    inBaseDirDo ${srcBuildBaseDir} make bootstrap
+    # -j: emacs parallelises well and this is the cheapest available speedup.
+    inBaseDirDo ${srcBuildBaseDir} make -j$( nproc ) bootstrap
 }
 
 _CommentBegin_
@@ -1630,9 +1851,26 @@ For example, for emacs-28 take care of the following:
 _EOF_
                        }
 
-    local emacsVersion=${srcPkgSelector##emacs}  # eg, 28 - emacs front stripped from emacs28
+    local emacsVersion=$( emacsVersionOfSelector )   # emacsNN -> NN ; emacsNext -> from configure.ac
     
     local emacsProg=$( ls -t /usr/local/bin/emacs-${emacsVersion}.* | head -1 )
+
+    # <2026-09-07> IDEMPOTENCY GUARD.
+    # This function reads /usr/local/bin/emacsclient below, but further down it RENAMES that
+    # same file to emacsclient-<fullVer>. So a second -i postInstall without an intervening
+    # make install used to die with "Missing /usr/local/bin/emacsclient". Detect the
+    # already-done state and report it instead of failing.
+    if [ ! -f /usr/local/bin/emacsclient ] ; then
+        if [ -f /usr/local/bin/emacsclient-${emacsVersion} ] ; then
+            ANT_raw "postInstall already done for emacs-${emacsVersion} -- nothing to do."
+            opDo ls -l /usr/local/bin/emacs-${emacsVersion} /usr/local/bin/emacsclient-${emacsVersion}
+            lpReturn
+        fi
+        EH_problem "Missing /usr/local/bin/emacsclient and no emacsclient-${emacsVersion} either."
+        EH_problem "Run -i srcBinInstall ${srcPkgSelector} first."
+        lpReturn 101
+    fi
+
     local emacsClientFullVersion=$( /usr/local/bin/emacsclient --version | cut -d ' ' -f 2 )
     local emacsClientVersion=$( /usr/local/bin/emacsclient --version | cut -d ' ' -f 2 | cut -d '.' -f 1 )
 
@@ -1692,9 +1930,10 @@ function installedVerify {
 _EOF_
                        }
 
-    local emacsVersion=${srcPkgSelector##emacs}  # eg, 28 - emacs front stripped from emacs29
-    
-    local emacsProg=$( echo /usr/local/bin/emacs-${emacsVersion}.* )
+    local emacsVersion=$( emacsVersionOfSelector )   # emacsNN -> NN ; emacsNext -> from configure.ac
+
+    # <2026-09-07> removed: local emacsProg=$( echo /usr/local/bin/emacs-${emacsVersion}.* )
+    # It was never used, and on no match "echo <glob>" yields the literal pattern anyway.
 
     local retVal=0
 

@@ -419,6 +419,74 @@ _EOF_
     lpReturn
 }
 
+####+BEGIN: NOTYET --- doomPinTable
+#
+# <<doomPinTable>>  --- Which doom commit each emacs major version is built against.
+#
+# WHY A TABLE AT ALL:
+#   Doom pins its OWN package versions (169 packages, 121 explicit pins as of 01d68aaf6).
+#   So the package set is a pure function of the doom commit. The doom commit is therefore
+#   the single lever controlling what blee actually is. Pin it and the whole tree is
+#   reproducible; leave it floating and all 169 packages move at once, silently.
+#
+# WHY KEYED ON THE DERIVED VERSION, NOT THE SELECTOR:
+#   emacs=sys / emacs=0 / emacs=28 / emacs=31 are SELECTORS, not versions, and what "sys"
+#   means differs per node. vis_getEmacsVerFromExec asks the binary itself, so every
+#   selector funnels through one honest question. Never key a pin on the selector.
+#   (Observed 2026-09-06: on this node emacs=sys -> 28.2 while emacs=28 FAILS, because the
+#   28.2 here is /bin/emacs and /usr/local/bin/emacs-28 does not exist.)
+#
+# THE WORKFLOW THIS ENCODES:
+#   Bring a new emacs version up on "latest", prove it builds and runs, THEN pin the commit
+#   it was proven with. "latest" is bring-up mode, not a steady state. Anything left on
+#   "latest" is by definition not yet proven.
+#
+# GRANULARITY: keyed on emacs MAJOR version. 31.1.50 and a future 31.4 share a pin, so each
+#   entry records which exact emacs version it was actually tested against --- that keeps the
+#   drift visible even though the key is coarse.
+#
+# TO MOVE A PIN: re-run bleeDoomsManage.sh -p emacs=<N> -i doomFrameworkPrep, rebuild, RUN it,
+#   then update the entry here including its testedAgainst/testedOn provenance.
+#
+####+END:
+
+function doomPinForEmacsMajor {
+    local emacsMajor="$1"
+
+    case ${emacsMajor} in
+        28)
+            # testedAgainst: emacs 28.x   testedOn: <2023-12-08>  status: FROZEN
+            # sha1 obtained Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
+            # Do not move this without re-testing blee on emacs28.
+            echo "03d692f129633e3bf0bd100d91b3ebf3f77db6d1"
+            ;;
+        31)
+            # testedAgainst: emacs 31.1.50   testedOn: <2026-09-06 Sun>   status: PROVEN
+            # doom 01d68aaf6 (2026-09-05 "docs: add warning about doomemacs.com").
+            # Evidence: doomFrameworkPrep + reBuild of profile doom-blee3 completed clean in
+            # 5m22s, 169 straight packages, "Doom successfully installed!", and blee-31 then
+            # ran well enough to drive magit and commit. Pinned on that evidence.
+            echo "01d68aaf6bd7db073365385cd82e1ad7e815295c"
+            ;;
+        *)
+            # No entry yet == not yet proven on this emacs version. Bring it up on latest,
+            # then add an entry above with its provenance.
+            echo "latest"
+            ;;
+    esac
+}
+
+function doomPinDescribe {
+    local emacsMajor="$1"
+    local doomPin=$( doomPinForEmacsMajor ${emacsMajor} )
+
+    if [ "${doomPin}" == "latest" ] ; then
+        echo "emacsMajor=${emacsMajor} doomPin=latest (UNPINNED -- tracking upstream master, not yet proven)"
+    else
+        echo "emacsMajor=${emacsMajor} doomPin=${doomPin}"
+    fi
+}
+
 function doomProfilePrep {
    G_funcEntry
    function describeF {  G_funcEntryShow; cat  << _EOF_

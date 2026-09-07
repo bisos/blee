@@ -255,25 +255,9 @@ _CommentBegin_
 *  [[elisp:(org-cycle)][| ]] [[elisp:(org-show-subtree)][|=]] [[elisp:(show-children 10)][|V]] [[elisp:(blee:ppmm:org-mode-toggle)][|N]] [[elisp:(bx:orgm:indirectBufOther)][|>]] [[elisp:(bx:orgm:indirectBufMain)][|I]] [[elisp:(beginning-of-buffer)][|^]] [[elisp:(org-top-overview)][|O]] [[elisp:(progn (org-shifttab) (org-content))][|C]] [[elisp:(delete-other-windows)][|1]] || IIC       ::  doomFrameworkPrep    [[elisp:(org-cycle)][| ]]
 _CommentEnd_
 
-function doomPinForEmacsMajor {
-    local emacsMajor="$1"
-
-    # The doom commit each emacs major version is built against.
-    # "latest" means track upstream master (git pull).
-    case ${emacsMajor} in
-        28)
-            # sha1 obtained Fri Dec 8 12:13:10 2023 from a stable release -- git rev-parse HEAD
-            # emacs28 is FROZEN here. Do not move this without re-testing blee on emacs28.
-            echo "03d692f129633e3bf0bd100d91b3ebf3f77db6d1"
-            ;;
-        31)
-            echo "latest"
-            ;;
-        *)
-            echo "latest"
-            ;;
-    esac
-}
+# doomPinForEmacsMajor and doomPinDescribe now live in bleeLib.sh, next to vis_getEmacsExec /
+# vis_getEmacsVer / doomProfilePrep --- see <<doomPinTable>> there. bleeLib.sh is sourced above,
+# so both are available here. Keeping one source of truth for the pins.
 
 function vis_doomFrameworkPrep {
    G_funcEntry
@@ -313,7 +297,14 @@ _EOF_
     local cloneBase="/bisos/git/anon/ext/emacs/doomemacs-${emacsMajor}"
     local linkBase="/bisos/blee/dooms/doomemacs-${emacsMajor}"
 
-    ANT_raw "emacs=${emacsExec} emacsVer=${emacsVerFull} emacsMajor=${emacsMajor} doomPin=${doomPin}"
+    ANT_raw "emacs=${emacsExec} emacsVer=${emacsVerFull}"
+    ANT_raw "$( doomPinDescribe ${emacsMajor} )"
+
+    if [ "${doomPin}" == "latest" ] ; then
+        ANT_raw "NOTE: emacsMajor=${emacsMajor} has no entry in doomPinTable (bleeLib.sh)."
+        ANT_raw "      This is BRING-UP mode. Once this emacs version is proven to build and"
+        ANT_raw "      run, pin the commit reported below by adding an entry to doomPinTable."
+    fi
 
     if [ ! -d "${cloneBase}" ] ; then
         lpDo git clone https://github.com/doomemacs/doomemacs.git ${cloneBase}
